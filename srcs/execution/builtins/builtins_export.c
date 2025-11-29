@@ -6,11 +6,11 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 16:22:17 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/22 14:53:33 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/28 22:00:50 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "builtins.h"
 
 int	ft_extract_key_value(char *token, char **key, char **value)
 {
@@ -101,7 +101,6 @@ int	ft_check_identifier_single(char *token, int *exit_status)
 	return (1);
 }
 
-
 char	**ft_export(char **envp, char **tokens, int *exit_status, int fd)
 {
 	size_t	i;
@@ -129,37 +128,3 @@ char	**ft_export(char **envp, char **tokens, int *exit_status, int fd)
 	}
 	return (envp);
 }
-
-/*char	**ft_export(char **envp, char **tokens, int *exit_status, int fd)
-{
-	size_t	i;
-
-	i = 1;
-	if (!tokens[1])
-		return (ft_sort_env(envp, fd));
-	while (tokens[i])
-	{
-		if (tokens[i][0] == '-')
-		{
-			ft_puterror("export", tokens[i], "invalid option");
-			*exit_status = 2;
-			i++;
-			continue ;
-		}
-		if (tokens[i][0] == '\0' || !ft_check_identifier_single(tokens[i],
-			exit_status))
-		{
-			if (tokens[i][0] == '\0')
-			{
-				ft_puterror("export", tokens[i], "not a valid identifier");
-				*exit_status = 1;
-			}
-			i++;
-			continue ;
-		}
-		if (!ft_process_export_token(&envp, tokens[i], exit_status))
-			return (envp);
-		i++;
-	}
-	return (envp);
-}*/

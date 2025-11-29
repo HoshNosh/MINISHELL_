@@ -1,22 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   expand_vars2.c                                     :+:      :+:    :+:   */
+/*   expand_variables.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/25 17:51:23 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/21 16:04:06 by sdossa           ###   ########.fr       */
+/*   Created: 2025/09/25 17:50:31 by sdossa            #+#    #+#             */
+/*   Updated: 2025/11/28 21:13:57 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "expand_vars.h"
-#include "expand_utils.h"
+#include "expand.h"
+#include "lexer.h"
 
 /*
-** Remplace une variable dans 1 chaîne par sa valeur.
-** Divise la chaine en 3: avant, valeur, après, puis les concatene.
-** Return la new chaîne ou la chaîne originale si erreur.
+** Joint trois chaînes en une seule.
+** Return la chaîne résultante ou NULL si erreur.
+*/
+char	*join_three_strings(char *s1, char *s2, char *s3)
+{
+	char	*temp;
+	char	*result;
+
+	if (!s1 || !s2 || !s3)
+		return (NULL);
+	temp = ft_strjoin(s1, s2);
+	if (!temp)
+		return (NULL);
+	result = ft_strjoin(temp, s3);
+	free(temp);
+	return (result);
+}
+
+/*
+** Remplace une variable dans une chaîne par sa valeur.
+** Découpe avant/après et reconstruit la chaîne.
 */
 char	*replace_variable(char *str, int start, int len, char *value)
 {
@@ -43,28 +61,8 @@ char	*replace_variable(char *str, int start, int len, char *value)
 }
 
 /*
-** Joint 3 chaînes en 1: strjoin concatene s1+s2 puis le result avec s3.
-** Return la chaîne finale ou NULL si erreur d'alloc.
-*/
-char	*join_three_strings(char *s1, char *s2, char *s3)
-{
-	char	*temp;
-	char	*result;
-
-	if (!s1 || !s2 || !s3)
-		return (NULL);
-	temp = ft_strjoin(s1, s2);
-	if (!temp)
-		return (NULL);
-	result = ft_strjoin(temp, s3);
-	free(temp);
-	return (result);
-}
-
-/*
-** Récupère la valeur d'une var selon son nom. Cas speciale '$?':
-** return code de retour (last_exit_code). Autres var: recherche
-** dans l'env. Return la valeur allouee ou NULL si inexistante.
+** Récupère la valeur d'une variable d'environnement.
+** Gère les cas spéciaux: $?, $UID, $EUID.
 */
 char	*get_variable_value(char *var_name, t_expand_ctx *ctx)
 {
@@ -78,12 +76,16 @@ char	*get_variable_value(char *var_name, t_expand_ctx *ctx)
 		return (ft_itoa(geteuid()));
 	value = get_env_value(var_name, ctx->env);
 	if (!value && (ft_strcmp(var_name, "USER") == 0
-		|| ft_strcmp(var_name, "HOME") == 0
-		|| ft_strcmp(var_name, "PWD") == 0))
+			|| ft_strcmp(var_name, "HOME") == 0
+			|| ft_strcmp(var_name, "PWD") == 0))
 		return (ft_strdup(""));
 	return (value);
 }
 
+/*
+** Traite une seule variable dans un token.
+** Extrait le nom, récupère la valeur et remplace.
+*/
 int	process_single_var(char **result, int i, t_expand_ctx *ctx)
 {
 	char	*var_name;
@@ -112,9 +114,8 @@ int	process_single_var(char **result, int i, t_expand_ctx *ctx)
 }
 
 /*
-** Traite ttes les var d'un token de manière itérative.
-** Parcourt la chaîne, remplace chaque '$' trouvé hors single quotes.
-** Recommence depuis debut après chaque remplacement pr gérer cas complexes.
+** Traite toutes les variables d'un token.
+** Remplace chaque $ trouvé hors single quotes.
 */
 char	*process_token_variables(char *result, t_expand_ctx *ctx)
 {

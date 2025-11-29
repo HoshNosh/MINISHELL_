@@ -6,11 +6,11 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 12:28:24 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/17 14:19:24 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/28 22:02:41 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "exec.h"
 
 static void	check_and_open_file(t_command *cmd, t_redirect *cur, int flags,
 			int *fd)

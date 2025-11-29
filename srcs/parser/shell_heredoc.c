@@ -6,22 +6,26 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 17:26:20 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/22 11:34:14 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/29 18:57:12 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "expand_vars.h"
+#include "exec.h"
+#include "builtins.h"
+#include "expand.h"
 #include "lexer.h"
-#include "lexer_utils.h"
-#include "node_cmd.h"
+#include "node_commands.h"
 #include "parser.h"
 #include "print_ast.h"
-#include "shell_loop.h"
-#include "syntax_check.h"
-#include "syntax_validation.h"
+#include "shell.h"
+#include "syntax.h"
 
-static int	init_heredoc_counter(int reset)
+/*
+** Compteur statique pour générer des noms de fichiers temporaires uniques.
+** Reset si reset=1, sinon incrémente et retourne la valeur.
+*/
+int	init_heredoc_counter(int reset)
 {
 	static int	counter = 0;
 
@@ -30,70 +34,83 @@ static int	init_heredoc_counter(int reset)
 	return (counter++);
 }
 
-static void	process_heredoc_redir(t_redirect *r, char *tmp_file, int is_first)
+/*
+** Crée et ouvre un fichier temporaire pour le heredoc.
+** Return le fd ou -1 si erreur.
+*/
+static int	open_heredoc_file(char **tmp_filename)
 {
-	int		fd;
+	int	fd;
+
+	*tmp_filename = ft_get_heredoc_filename(init_heredoc_counter(0));
+	fd = open(*tmp_filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd == -1)
+	{
+		perror("heredoc");
+		free(*tmp_filename);
+		*tmp_filename = NULL;
+	}
+	return (fd);
+}
+
+/*
+** Lit le contenu du heredoc et l'écrit dans le fichier.
+** Gère le limiteur avec newline. Return 0 succès, -1 si CTRL-C.
+*/
+static int	write_heredoc_content(t_redirect *r, int fd)
+{
 	char	*original_filename;
 	char	*limiter;
-	int		flags;
+	int		result;
 
-	if (is_first)
-		flags = O_WRONLY | O_CREAT | O_TRUNC;
-	else
-		flags = O_WRONLY | O_CREAT | O_APPEND;
-	fd = open(tmp_file, flags, 0644);
-	if (fd == -1)
-		return ;
 	original_filename = ft_strdup(r->filename);
 	limiter = ft_strjoin(original_filename, "\n");
 	free(original_filename);
-	read_heredoc_content(limiter, fd);
+	result = read_heredoc_content(limiter, fd);
 	free(limiter);
-	close(fd);
+	return (result);
 }
 
-void	read_heredocs_before_exec(t_node *node)
+/*
+** Finalise le heredoc: assigne le fichier ou le supprime.
+** Si dernier heredoc, remplace filename, sinon supprime le fichier.
+*/
+static void	finalize_heredoc(t_redirect *r, char *tmp, int is_last)
 {
-	t_redirect	*r;
-	t_redirect	*last_heredoc;
-	char		*tmp_file;
-	int			is_first;
-
-	init_heredoc_counter(1);
-	if (!node)
-		return ;
-	if (node->type == NODE_COMMAND && node->command && node->command->redir)
+	if (is_last)
 	{
-		last_heredoc = NULL;
-		r = node->command->redir;
-		while (r)
-		{
-			if (r->type == REDIR_HEREDOC)
-				last_heredoc = r;
-			r = r->next;
-		}
-		if (!last_heredoc)
-			return ;
-		tmp_file = ft_get_heredoc_filename(init_heredoc_counter(0));
-		r = node->command->redir;
-		is_first = 1;
-		while (r)
-		{
-			if (r->type == REDIR_HEREDOC)
-			{
-				process_heredoc_redir(r, tmp_file, is_first);
-				is_first = 0;
-				free(r->filename);
-				r->filename = ft_strdup(tmp_file);
-			}
-			r = r->next;
-		}
-		free(tmp_file);
+		free(r->filename);
+		r->filename = tmp;
 	}
-	else if (node->type == NODE_PIPE)
+	else
 	{
-		read_heredocs_before_exec(node->left);
-		read_heredocs_before_exec(node->right);
+		unlink(tmp);
+		free(tmp);
 	}
 }
 
+/*
+** Traite un heredoc: crée fichier temporaire, lit contenu, finalise.
+** Comportement bash: tous les heredocs sont lus, seul le dernier est utilisé.
+** Return 0 succès, -1 si CTRL-C.
+*/
+int	process_heredoc_redir(t_redirect *r, int *is_last)
+{
+	char	*tmp;
+	int		fd;
+	int		result;
+
+	fd = open_heredoc_file(&tmp);
+	if (fd == -1)
+		return (-1);
+	result = write_heredoc_content(r, fd);
+	close(fd);
+	if (result == -1)
+	{
+		unlink(tmp);
+		free(tmp);
+		return (-1);
+	}
+	finalize_heredoc(r, tmp, *is_last);
+	return (0);
+}

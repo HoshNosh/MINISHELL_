@@ -6,11 +6,11 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 12:31:26 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/21 13:03:50 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/29 15:49:06 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "exec.h"
 
 /*
 ** Ouvre un fichier selon le mode demandé.
@@ -64,15 +64,10 @@ char	*ft_get_heredoc_filename(int index)
 static int	create_tmp_file(t_command *command, t_redirect *cur, char *tmp_path,
 	int tmpfile_fd)
 {
-	char	*limiter_n;
 	int		write_fd;
 
 	write_fd = ft_open_file(tmp_path, 0, command);
-	limiter_n = ft_strjoin(cur->filename, "\n");
-	if (!limiter_n)
-		ft_exit_free("malloc heredoc limiter", EXIT_FAILURE, command);
-	read_heredoc_content(limiter_n, write_fd);
-	free(limiter_n);
+	read_heredoc_content(cur->filename, write_fd);
 	close(write_fd);
 	if (!cur->next || cur->next->type != REDIR_HEREDOC)
 	{
@@ -112,88 +107,5 @@ int	get_heredoc(t_command *command)
 		}
 		cur = cur->next;
 	}
-	//printf("%s", tmp_path);
 	return (tmpfile_fd);
 }
-
-
-
-
-
-/*
-** Gère tous les heredocs d'une commande :
-** - crée un fichier temporaire pour chacun (/tmp/heredoc_X)
-** - lit leur contenu depuis stdin
-** - garde le dernier heredoc ouvert en lecture (pour stdin)
-** - supprime les fichiers temporaires (unlink)
-*
-int	get_heredoc(t_command *command)
-{
-	t_redirect	*cur;
-	int			i;
-	int			tmpfile_fd;
-	char		*tmp_path;
-
-	cur = command->redir;
-	i = 0;
-	tmpfile_fd = -1;
-	while (cur)
-	{
-		if (cur->type == REDIR_HEREDOC)
-		{
-			tmp_path = ft_get_heredoc_filename(i++);
-			if (!tmp_path)
-				ft_exit_free("heredoc filename", EXIT_FAILURE, command);
-			tmpfile_fd = create_tmp_file(command, cur, tmp_path, tmpfile_fd);
-			// cur->filename = ft_strdup(tmp_path);
-			free(tmp_path);
-		}
-		cur = cur->next;
-	}
-	printf("%s", tmp_path);
-	return (tmpfile_fd);
-}*/
-
-
-// void	prepare_heredocs(t_node *node)
-// {
-// 	t_redirect	*r;
-
-// 	if (!node)
-// 		return ;
-// 	if (node->type == NODE_COMMAND && node->command)
-// 	{
-// 		r = node->command->redir;
-// 		while (r)
-// 		{
-// 			if (r->type == REDIR_HEREDOC)
-// 			{
-// 				// Stocker le FD dans la command
-// 				// (tu dois ajouter un champ heredoc_fd dans t_command)
-// 			}
-// 			r = r->next;
-// 		}
-// 	}
-// 	else if (node->type == NODE_PIPE)
-// 	{
-// 		prepare_heredocs(node->left);
-// 		prepare_heredocs(node->right);
-// 	}
-// }
-
-/*void	prepare_heredocs(t_node *node)
-{
-	if (!node)
-		return ;
-
-	if (node->type == NODE_COMMAND && node->command)
-	{
-		// Appeler get_heredoc une seule fois par commande
-		node->command->redir->heredoc_fd = get_heredoc(node->command);
-	}
-	else if (node->type == NODE_PIPE)
-	{
-		prepare_heredocs(node->left);
-		prepare_heredocs(node->right);
-	}
-}*/

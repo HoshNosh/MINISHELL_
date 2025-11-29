@@ -6,13 +6,13 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 14:17:19 by sdossa            #+#    #+#             */
-/*   Updated: 2025/10/27 20:19:16 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/28 21:42:07 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "syntax_check.h"
-#include "shell_loop.h"
+#include "syntax.h"
+#include "shell.h"
 
 /*
 ** Check que les pipes ne sont pas en 1ère/dernière pos ou consécutifs.

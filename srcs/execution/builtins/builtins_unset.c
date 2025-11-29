@@ -6,11 +6,11 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 14:12:50 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/17 13:59:43 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/28 22:00:59 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "builtins.h"
 
 static void	ft_remove_env_entry(char **envp, size_t b)
 {

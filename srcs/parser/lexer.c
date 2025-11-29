@@ -6,13 +6,13 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 11:10:40 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/11 19:17:39 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/29 11:27:50 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "lexer.h"
-#include "lexer_utils.h"
+#include "shell.h"
 
 /*
 ** Gère l'avancement dans une quote ouverte.
@@ -65,7 +65,7 @@ static int	count_tokens(char *line)
 	count = 0;
 	while (*line)
 	{
-		while (*line == ' ')
+		while (*line == ' ' || *line == '\t')
 			line++;
 		if (*line)
 		{

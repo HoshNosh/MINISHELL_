@@ -6,12 +6,13 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 12:33:45 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/16 17:54:45 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/28 22:09:16 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
-#include "lexer_utils.h"
+#include "exec.h"
+#include "lexer.h"
+#include "builtins.h"
 
 /*
 ** Affiche un message d’erreur formaté et quitte proprement le programme.

@@ -6,11 +6,11 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 12:28:24 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/22 11:22:50 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/29 20:33:22 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "exec.h"
 
 /*
 ** Ferme tous les file descriptors de validation
@@ -29,216 +29,87 @@ void	close_validation_fds(int *fds, int count)
 	free(fds);
 }
 
-static int	validate_redir_phase(t_redirect *tmp)
+/*
+** Applique une redirection d'entrée (REDIR_IN ou REDIR_HEREDOC).
+*/
+static void	apply_input_redir(t_redirect *redir)
 {
 	int	fd;
 
-	fd = -1;
-	while (tmp)
+	fd = open(redir->filename, O_RDONLY);
+	if (fd != -1)
 	{
-		if (tmp->type == REDIR_IN || tmp->type == REDIR_HEREDOC)
-			fd = open(tmp->filename, O_RDONLY);
-		else if (tmp->type == REDIR_OUT)
-			fd = open(tmp->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		else if (tmp->type == REDIR_APPEND)
-			fd = open(tmp->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		if (fd == -1)
-		{
-			perror(tmp->filename);
-			return (-1);
-		}
-		close(fd);
-		tmp = tmp->next;
-	}
-	return (0);
-}
-
-// cela fonction mais n'affiche pas les infos du 1er heredoc 21/11/25
-static void	apply_redir(t_redirect *redir)
-{
-	int	fd;
-
-	if (redir->type == REDIR_IN)
-	{
-		fd = open(redir->filename, O_RDONLY);
 		dup2(fd, STDIN_FILENO);
-		close(fd);
-	}
-	else if (redir->type == REDIR_HEREDOC)
-	{
-		fd = open(redir->filename, O_RDONLY);
-		if (fd != -1)
-		{
-			dup2(fd, STDIN_FILENO);
-			close(fd);
-		}
-	}
-	else if (redir->type == REDIR_OUT)
-	{
-		fd = open(redir->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		dup2(fd, STDOUT_FILENO);
-		close(fd);
-	}
-	else if (redir->type == REDIR_APPEND)
-	{
-		fd = open(redir->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		dup2(fd, STDOUT_FILENO);
 		close(fd);
 	}
 }
-
-/*static void	apply_redir(t_redirect *redir)
-{
-	int	fd;
-
-	if (redir->type == REDIR_IN )
-	{
-		fd = open(redir->filename, O_RDONLY);
-		dup2(fd, STDIN_FILENO);
-		close(fd);
-	}
-	else if (redir->type == REDIR_HEREDOC)
-	{
-		// close(redir->heredoc_fd);
-		fd = open(redir->filename, O_RDONLY);
-		dup2(fd, STDIN_FILENO);
-		close(fd);
-	}
-	else if (redir->type == REDIR_OUT)
-	{
-		fd = open(redir->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		dup2(fd, STDOUT_FILENO);
-		close(fd);
-	}
-	else if (redir->type == REDIR_APPEND)
-	{
-		fd = open(redir->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		dup2(fd, STDOUT_FILENO);
-		close(fd);
-	}
-}*/
 
 /*
-** Parcourt et applique toutes les redirections
-** !! = Cette ft ne doit être appelée QUE si validate_all_redirections
-** a réussi. Elle réouvre les fichiers et applique les redirections.
-*
-// cela fonction mais n'affiche pas les infos du 1er heredoc 21/11/25
-int	handle_redirections(t_redirect *redir)
+** Applique une redirection de sortie (REDIR_OUT ou REDIR_APPEND).
+*/
+static void	apply_output_redir(t_redirect *redir)
+{
+	int	fd;
+
+	if (redir->type == REDIR_OUT)
+		fd = open(redir->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	else
+		fd = open(redir->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	dup2(fd, STDOUT_FILENO);
+	close(fd);
+}
+
+/*
+** Applique toutes les redirections et nettoie les fichiers heredoc.
+** Skip les heredocs non-derniers.
+*/
+static void	apply_all_redirs(t_redirect *redir, t_redirect *last_heredoc)
 {
 	t_redirect	*tmp;
-	t_redirect	*cleanup;
 
 	tmp = redir;
-	if (validate_redir_phase(tmp) == -1)
-		return (-1);
-	while (redir)
+	while (tmp)
 	{
-		apply_redir(redir);
-		redir = redir->next;
+		if (tmp->type == REDIR_HEREDOC && tmp != last_heredoc)
+		{
+			tmp = tmp->next;
+			continue ;
+		}
+		if (tmp->type == REDIR_IN || tmp->type == REDIR_HEREDOC)
+			apply_input_redir(tmp);
+		else if (tmp->type == REDIR_OUT || tmp->type == REDIR_APPEND)
+			apply_output_redir(tmp);
+		tmp = tmp->next;
 	}
-	// Cleanup heredoc files after use
-	cleanup = tmp;
-	while (cleanup)
+	tmp = redir;
+	while (tmp)
 	{
-		if (cleanup->type == REDIR_HEREDOC && cleanup->filename)
-			unlink(cleanup->filename);
-		cleanup = cleanup->next;
+		if (tmp->type == REDIR_HEREDOC && tmp->filename)
+			unlink(tmp->filename);
+		tmp = tmp->next;
 	}
-	return (0);
-}*/
+}
 
 /*
-** Parcourt et applique toutes les redirections
-** !! = Cette ft ne doit être appelée QUE si validate_all_redirections
-** a réussi. Elle réouvre les fichiers et applique les redirections.
+** Parcourt et applique toutes les redirections.
+** Trouve d'abord le dernier heredoc, puis valide et applique les redirections.
+** Seul le dernier heredoc est utilisé (les autres ont été supprimés).
 */
 int	handle_redirections(t_redirect *redir)
 {
+	t_redirect	*last_heredoc;
 	t_redirect	*tmp;
-	t_redirect	*cleanup;
 
+	last_heredoc = NULL;
 	tmp = redir;
-	if (validate_redir_phase(tmp) == -1)
+	while (tmp)
+	{
+		if (tmp->type == REDIR_HEREDOC)
+			last_heredoc = tmp;
+		tmp = tmp->next;
+	}
+	if (validate_redir_phase(redir, last_heredoc) == -1)
 		return (-1);
-	while (redir)
-	{
-		apply_redir(redir);
-		redir = redir->next;
-	}
-	cleanup = tmp;
-	while (cleanup)
-	{
-		if (cleanup->type == REDIR_HEREDOC && cleanup->filename)
-			unlink(cleanup->filename);
-		cleanup = cleanup->next;
-	}
+	apply_all_redirs(redir, last_heredoc);
 	return (0);
 }
-
-
-/*
-** Parcourt et applique toutes les redirections
-** !! = Cette ft ne doit être appelée QUE si validate_all_redirections
-** a réussi. Elle réouvre les fichiers et applique les redirections.
-*
-int	handle_redirections(t_redirect *redir)
-{
-	t_redirect	*tmp;
-	t_redirect	*cleanup;
-	t_redirect	*last_heredoc;
-
-	tmp = redir;
-	if (validate_redir_phase(tmp) == -1)
-		return (-1);
-	// Find last heredoc first
-	last_heredoc = NULL;
-	cleanup = redir;
-	while (cleanup)
-	{
-		if (cleanup->type == REDIR_HEREDOC)
-			last_heredoc = cleanup;
-		cleanup = cleanup->next;
-	}
-	// Apply redirections, skipping non-last heredocs
-	while (redir)
-	{
-		if (redir->type == REDIR_HEREDOC && redir != last_heredoc)
-		{
-			// Skip non-last heredocs
-			redir = redir->next;
-			continue;
-		}
-		apply_redir(redir);
-		redir = redir->next;
-	}
-	// Cleanup heredoc files after use
-	cleanup = tmp;
-	while (cleanup)
-	{
-		if (cleanup->type == REDIR_HEREDOC && cleanup->filename)
-			unlink(cleanup->filename);
-		cleanup = cleanup->next;
-	}
-	return (0);
-}*/
-
-/*
-** Parcourt et applique toutes les redirections
-** !! = Cette ft ne doit être appelée QUE si validate_all_redirections
-** a réussi. Elle réouvre les fichiers et applique les redirections.
-*
-int	handle_redirections(t_redirect *redir)
-{
-	t_redirect	*tmp;
-
-	tmp = redir;
-	if (validate_redir_phase(tmp) == -1)
-		return (-1);
-	while (redir)
-	{
-		apply_redir(redir);
-		redir = redir->next;
-	}
-	return (0);
-}*/

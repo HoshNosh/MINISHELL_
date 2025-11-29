@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 13:28:09 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/21 13:26:13 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/28 22:12:06 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,8 +52,8 @@ typedef enum e_redir_type
 typedef struct s_redirect
 {
 	int					type;
+	int					fd;
 	char				*filename;
-	//int					heredoc_fd;
 	struct s_redirect	*next;
 }	t_redirect;
 
@@ -71,6 +71,8 @@ typedef struct s_node
 	t_command		*command;
 }	t_node;
 
+
+
 /*MOTHER STRUCTURE*/
 
 typedef struct s_mother_shell
@@ -82,6 +84,16 @@ typedef struct s_mother_shell
 	char				**last_expanded_tokens;
 }	t_mother_shell;
 
+
+typedef struct s_builtin_ctx
+{
+	char	***envp;
+	int	*exit_status;
+	int	fd;
+	t_mother_shell	*shell;
+}	t_builtin_ctx;
+
+
 /****************************************************************/
 /*                       	FUNCTIONS                           */
 /****************************************************************/
@@ -89,91 +101,6 @@ typedef struct s_mother_shell
 extern void	rl_replace_line(const char *str, int n);
 extern volatile sig_atomic_t	g_sigint_received;
 
-/****************************************************************/
-/*              FONCTIONS BUILTINS                              */
-/****************************************************************/
 
-int	ft_tabchr_home(char **env);
-int	tab_size(char **tab);
-void	ft_cd(char **tokens, int *exit_status, char **env);
-void	ft_cd_invalid_opt(char **tokens, int *exit_code, char **env);
-void	ft_parse_flags(char **tokens, size_t *i, int *print_newline);
-void	ft_print_tok(char **tokens, size_t i, int output_fd);
-void	ft_echo(char **tokens, int output_fd);
-char		*ft_strdup2(char *src, int n);
-int		ft_env(char **envp, int output_fd, char **argv);
-char	**ft_minimal_env(char **envp);
-void		ft_exit(char **tokens, int *exit_status, t_mother_shell *shell);
-void	ft_print_export(char **env, int output_fd);
-void	ft_swap(char **s1, char **s2);
-char		**ft_sort_env(char **env, int output_fd);
-int	ft_extract_key_value(char *token, char **key, char **value);
-int	ft_replace_env_var(char **envp, char *key, char *value);
-int	ft_add_new_env_var(char ***envp, char *key, char *value);
-int	ft_check_identifier_single(char *token, int *exit_status);
-char	**ft_export(char **envp, char **tokens, int *exit_status, int fd);
-void	ft_pwd(int output_fd, char **tokens, int *exit_code);
-char	**ft_unset(char **envp, char **tokens, int *exit_status);
-int	ft_check_option(int *exit_status, char **tokens);
-char	**ft_duplicate_env(char **envp);
-int			ft_isbuiltin(char *str);
-void		ft_exebuiltin(char **tokens, char ***envp, int *exit, int fd, t_mother_shell *shell);
-int	ft_error_builtin(char *path, char *error, int error_code, int *exit_code);
-int	ft_check_path_builtin(char *path, int *exit_code);
-int	ft_check_redirection(t_command *command, int *exit_code);
-
-void	ft_puterror(char *cmd, char *cmd2, char *error);
-char **ft_add_to_array(char **arr, char *str);
-void ft_free_tab(char **tab);
-
-int	ft_create_env_entry(char ***envp, size_t size, char *key, char *value);
-int	ft_process_export_token(char ***envp, char *token, int *exit_status);
-
-/****************************************************************/
-/*              FONCTIONS UTILITAIRES                           */
-/****************************************************************/
-
-/* EXEC HEREDOC AND READ */
-void	read_heredoc_content(char *limiter_n, int tmpfile_fd);
-int	get_heredoc(t_command *command);
-char	*ft_get_heredoc_filename(int index);
-//void	prepare_heredocs(t_node *node);
-
-void read_heredoc_content(char *limiter_n, int tmpfile_fd);
-
-/* EXEX PATH */
-void	ft_check_path(char *path, t_command *command);
-char	**get_path_tab(char **env);
-char	*ft_join_path(char *cmd, char *path);
-char	*get_path(char *cmd, char **env);
-
-/* EXEC REDIR HANDLE AND VALIDATE AND INOUT */
-int		handle_redirections(t_redirect *redir);
-void	close_validation_fds(int *fds, int count);
-
-void	infile_redirection(t_command *command);
-void	outfile_truncate_redirection(t_command *command);
-void	outfile_append_redirection(t_command *command);
-
-//int	validate_and_store(t_redirect *redir, int *fds, int *count);
-int	validate_all_redirections(t_redirect *redir, int **fds_out, int *count_out);
-
-/* EXEC UTILS */
-void	ft_exit_error(char *path, char *error, int code, t_command *cmd);
-void	ft_free_command(t_command *command);
-void	ft_exit_free(char *msg, int status, t_command *cmd);
-void	close_inherited_fds(void);
-void	setup_signal_handling(void);
-
-/* EXEC COMMANDE AND PIPE */
-int	execute_simple_command(t_node *node, t_mother_shell *shell);
-int	execute_pipe(t_node *node, t_mother_shell *shell);
-int	execute_ast(t_node *node, t_mother_shell *shell);
-
-
-void read_heredocs_before_exec(t_node *node);
-int	check_redirections_validity(t_redirect *redir);
-
-void	free_shell(t_mother_shell *shell);
 
 #endif

@@ -6,15 +6,15 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 17:42:57 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/19 16:05:08 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/29 18:56:10 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "expand_utils.h"
+#include "expand.h"
 
 /*
-** Check et parcourt la chaîne à la recherche d'1 var ('$')
-** suivi d'1 char. Return 1 si var trouvée.
+** Vérifie si une chaîne contient une variable ($).
+** Return 1 si trouvé hors échappement, 0 sinon.
 */
 int	has_variable(char *str)
 {
@@ -40,8 +40,8 @@ int	has_variable(char *str)
 }
 
 /*
-** Récupère la valeur d'une var d'env, la cherche ds le tab env et
-** return sa valeur. Return chaîne vide si la var n'existe pas.
+** Récupère la valeur d'une variable d'environnement.
+** Return la valeur allouée ou chaîne vide si inexistante.
 */
 char	*get_env_value(char *var_name, char **env)
 {
@@ -66,9 +66,8 @@ char	*get_env_value(char *var_name, char **env)
 }
 
 /*
-** Vérifie si une pos ds la chaîne est à l'intérieur de single quotes .
-** Compte les single quotes non échappés jusqu'à la pos donnée.
-** Return 1 si pos est entre guillemets simples.
+** Vérifie si une position est dans des single quotes.
+** Compte les quotes non-échappées jusqu'à la position.
 */
 int	is_in_single_quotes(char *str, int pos)
 {
@@ -87,9 +86,8 @@ int	is_in_single_quotes(char *str, int pos)
 }
 
 /*
-** Gère cas spécial de variables ($?, $", $', etc.).
-** Traite les var spé comme le code de retour et les char spéciaux.
-** Return la valeur correspondante ou NULL si ce n'est pas un cas spécial.
+** Gère les cas spéciaux de variables ($?, $", $', $0-9).
+** Return la valeur correspondante ou NULL si pas spécial.
 */
 char	*handle_special_var_cases(char *str, int start)
 {
@@ -105,6 +103,10 @@ char	*handle_special_var_cases(char *str, int start)
 	return (NULL);
 }
 
+/*
+** Extrait un nom de variable en sautant les markers.
+** Return le nom alloué ou NULL si erreur.
+*/
 char	*extract_varname(char *str, int start, int len)
 {
 	char	*name;

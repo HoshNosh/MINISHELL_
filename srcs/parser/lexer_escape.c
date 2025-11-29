@@ -6,13 +6,12 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 07:18:35 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/16 15:10:28 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/28 21:28:31 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "lexer_utils.h"
-#include "lexer_escape.h"
+#include "lexer.h"
 
 /*
 ** Avance dans la ligne, gere les echappements dans dbl quotes.

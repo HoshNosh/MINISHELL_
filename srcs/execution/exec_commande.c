@@ -6,16 +6,16 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:37:50 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/22 12:01:15 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/29 15:48:08 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
-#include "lexer_utils.h"
-#include "expand_vars.h"
+#include "exec.h"
+#include "builtins.h"
+#include "lexer.h"
+#include "expand.h"
 
-static void	child_exit_with_cleanup(t_node *node, t_mother_shell *shell,
-		int status)
+void	child_exit_with_cleanup(t_node *node, t_mother_shell *shell, int status)
 {
 	(void)node;
 	if (shell && shell->last_expanded_tokens)
@@ -30,18 +30,23 @@ static void	child_exit_with_cleanup(t_node *node, t_mother_shell *shell,
 	exit(status);
 }
 
-/* static  */void	execute_builtin_child(t_node *node, t_mother_shell *shell)
+void	execute_builtin_child(t_node *node, t_mother_shell *shell)
 {
-	ft_exebuiltin(node->command->argv, &shell->env,
-	&shell->last_status, STDOUT_FILENO, shell);
+	t_builtin_ctx	ctx;
+
+	ctx.envp = &shell->env;
+	ctx.exit_status = &shell->last_status;
+	ctx.fd = STDOUT_FILENO;
+	ctx.shell = shell;
+	ft_exec_builtin(node->command->argv, &ctx);
 	child_exit_with_cleanup(node, shell, shell->last_status);
 }
 
-/* static  */void	execute_external_child(t_node *node, t_mother_shell *shell)
+void	execute_external_child(t_node *node, t_mother_shell *shell)
 {
 	char	*cmd_path;
-	int		i;
 	int		exit_code;
+	int		i;
 
 	i = 0;
 	while (node->command->argv && node->command->argv[i])
@@ -55,7 +60,6 @@ static void	child_exit_with_cleanup(t_node *node, t_mother_shell *shell,
 		ft_puterror(node->command->argv[0], NULL, "command not found");
 		child_exit_with_cleanup(node, shell, 127);
 	}
-	exit_code = 0;
 	if (!ft_check_path_builtin(cmd_path, &exit_code))
 	{
 		free(cmd_path);
@@ -67,7 +71,7 @@ static void	child_exit_with_cleanup(t_node *node, t_mother_shell *shell,
 	child_exit_with_cleanup(node, shell, 126);
 }
 
-static int	execute_forked_command(t_node *node, t_mother_shell *shell)
+int	execute_forked_command(t_node *node, t_mother_shell *shell)
 {
 	pid_t	pid;
 	int		status;
@@ -79,78 +83,40 @@ static int	execute_forked_command(t_node *node, t_mother_shell *shell)
 	{
 		signal(SIGINT, SIG_DFL);
 		signal(SIGQUIT, SIG_DFL);
+		signal(SIGTSTP, SIG_DFL);
 		if (handle_redirections(node->command->redir) == -1)
 			child_exit_with_cleanup(node, shell, 1);
-		if (ft_isbuiltin(node->command->argv[0]))
+		if (ft_is_builtin(node->command->argv[0]))
 			execute_builtin_child(node, shell);
 		execute_external_child(node, shell);
 	}
 	waitpid(pid, &status, 0);
-	if (WIFEXITED(status))
-		shell->last_status = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status))
-	{
-		shell->last_status = 128 + WTERMSIG(status);
-		if (WTERMSIG(status) == SIGQUIT)
-		{
-			ft_putstr_fd(RED, STDERR_FILENO);
-			ft_putstr_fd("Quit (core dumped)", STDERR_FILENO);
-			ft_putendl_fd(RESET, STDERR_FILENO);
-		}
-	}
+	handle_wait_status(shell, status);
 	return (0);
 }
 
-/*
-** Exécute une commande simple (NODE_COMMAND)
-*/
 int	execute_simple_command(t_node *node, t_mother_shell *shell)
 {
-	int	*fds;
-	int	count;
+	t_builtin_ctx	ctx;
 
 	if (!node || !node->command)
 		return (0);
 	if (!node->command->argv || !node->command->argv[0])
-	{
-		if (node->command->redir)
-		{
-			if (validate_all_redirections(node->command->redir, &fds, &count) == -1)
-			{
-				shell->last_status = 1;
-				return (0);
-			}
-			close_validation_fds(fds, count);
-		}
-		shell->last_status = 0;
+		return (handle_no_argv(node, shell));
+	if (check_empty_or_special(node, shell))
 		return (0);
-	}
-	if (node->command->argv[0][0] == '\0')
+	if (ft_is_builtin(node->command->argv[0]))
 	{
-		ft_putstr_fd(": command not found\n", 2);
-		shell->last_status = 127;
-		return (0);
-	}
-	if (ft_strcmp(node->command->argv[0], ".") == 0)
-	{
-		if (!node->command->argv[1])
+		if (!node->command->redir)
 		{
-			ft_putstr_fd(".: filename argument required\n", 2);
-			shell->last_status = 2;
+			ctx.envp = &shell->env;
+			ctx.exit_status = &shell->last_status;
+			ctx.fd = STDOUT_FILENO;
+			ctx.shell = shell;
+			ft_exec_builtin(node->command->argv, &ctx);
 			return (0);
 		}
-	}
-	if (ft_strcmp(node->command->argv[0], "..") == 0)
-	{
-		ft_putstr_fd("..: command not found\n", 2);
-		shell->last_status = 127;
-		return (0);
-	}
-	if (ft_isbuiltin(node->command->argv[0]) && !node->command->redir)
-	{
-		ft_exebuiltin(node->command->argv, &shell->env,
-			&shell->last_status, STDOUT_FILENO, shell);
-		return (0);
+		return (execute_builtin_with_redir(node, shell));
 	}
 	return (execute_forked_command(node, shell));
 }

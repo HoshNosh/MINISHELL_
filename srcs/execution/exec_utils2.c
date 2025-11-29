@@ -6,11 +6,12 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 14:50:40 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/19 16:42:15 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/29 15:51:57 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "exec.h"
+#include "builtins.h"
 
 void	ft_puterror(char *cmd, char *cmd2, char *error)
 {
@@ -57,8 +58,6 @@ char	**ft_add_to_array(char **arr, char *str)
 		free(arr);
 	return (new_arr);
 }
-
-
 
 void	ft_free_tab(char **tab)
 {

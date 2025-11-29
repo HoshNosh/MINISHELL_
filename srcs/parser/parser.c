@@ -6,20 +6,17 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:19:45 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/17 16:39:37 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/29 18:56:30 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
-#include "parser_redir.h"
-#include "parser_utils.h"
-#include "node_cmd.h"
+#include "node_commands.h"
 
 /*
 ** Crée une struct t_command à partir des tokens[start...end-1].
-** Alloue la struct, parse les redir et args.
-** Return la cmd créée ou NULL en cas d'erreur.
+** Alloue la struct, parse les redirections et arguments.
 */
 t_command	*new_command(char **tokens, int start, int end)
 {
@@ -41,9 +38,8 @@ t_command	*new_command(char **tokens, int start, int end)
 }
 
 /*
-** Crée un nœud de cmd et le connecte à l'arbre existant.
-** Si root est NULL, retourne directement le nœud de cmd.
-** Sinon crée un nœud pipe pour connecter root et la nouvelle cmd.
+** Crée un nœud de commande et le connecte à l'arbre existant.
+** Si root est NULL, retourne directement le nœud de commande.
 */
 t_node	*add_command_to_tree(t_node *root, char **tokens, int start, int end)
 {
@@ -74,38 +70,8 @@ t_node	*add_command_to_tree(t_node *root, char **tokens, int start, int end)
 /*
 ** Fonction principale de parsing des tokens.
 ** Point d'entrée pour transformer les tokens en AST.
-** Délègue le travail à parse_pipe_sequence.
 */
 t_node	*parse_tokens(char **tokens)
 {
 	return (parse_pipe_sequence(tokens, 0));
-}
-
-/*
-** Parse une séquence de cmd séparées par des pipes.
-** Construit l'AST en traitant chaque cmd entre les pipes.
-** Return la racine de l'arbre ou NULL si erreur.
-*/
-t_node	*parse_pipe_sequence(char **tokens, int start)
-{
-	t_node	*root;
-	int		pipe_pos;
-	int		end;
-
-	root = NULL;
-	while (tokens[start])
-	{
-		pipe_pos = find_next_pipe(tokens, start);
-		if (pipe_pos == -1)
-		{
-			end = count_tokens_from(tokens, start);
-			root = add_command_to_tree(root, tokens, start, start + end);
-			break ;
-		}
-		root = add_command_to_tree(root, tokens, start, pipe_pos);
-		if (!root)
-			return (NULL);
-		start = pipe_pos + 1;
-	}
-	return (root);
 }

@@ -1,21 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   syntax_validation.h                                :+:      :+:    :+:   */
+/*   node_commands.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/10 05:58:47 by sdossa            #+#    #+#             */
-/*   Updated: 2025/09/10 06:46:37 by sdossa           ###   ########.fr       */
+/*   Created: 2025/09/10 00:36:57 by sdossa            #+#    #+#             */
+/*   Updated: 2025/11/28 21:37:23 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SYNTAX_VALIDATION_H
-# define SYNTAX_VALIDATION_H
+#ifndef NODE_COMMANDS_H
+# define NODE_COMMANDS_H
 
-int	is_pipe(char *token);
-int	validate_redirections(char **tokens);
-int	validate_pipes(char **tokens);
-int	validate_syntax(char **tokens);
+t_node	*new_command_node(t_command *cmd);
+t_node	*new_pipe_node(t_node *left, t_node *right);
+void	free_node(t_node *node);
+void	free_command(t_command *cmd);
 
 #endif

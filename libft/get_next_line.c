@@ -64,10 +64,11 @@ static char	*fetch_next_line(char **buffer_ptr)
 static char	*ft_fetch_lignes(int fd, char *lines)
 {
 	char	*buf;
+	char	*joined;
 	int		read_bytes;
 
-	if (!lines)
-		lines = ft_chardup("");
+	if (!lines && !(lines = ft_chardup("")))
+		return (NULL);
 	buf = malloc(BUFFER_SIZE + 1);
 	if (!buf)
 		return (free(lines), NULL);
@@ -78,9 +79,11 @@ static char	*ft_fetch_lignes(int fd, char *lines)
 		if (read_bytes == -1)
 			return (free(buf), free(lines), NULL);
 		buf[read_bytes] = '\0';
-		lines = ft_strjoin(lines, buf);
-		if (!lines)
-			return (free(buf), NULL);
+		joined = ft_strjoin(lines, buf);
+		if (!joined)
+			return (free(buf), free(lines), NULL);
+		free(lines);
+		lines = joined;
 	}
 	free(buf);
 	return (lines);
@@ -92,7 +95,11 @@ char	*get_next_line(int fd)
 	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
+	{
+		if (fd < 0)
+			return (free(buf), buf = NULL, NULL);
 		return (NULL);
+	}
 	buf = ft_fetch_lignes(fd, buf);
 	if (!buf || buf[0] == '\0')
 		return (free(buf), buf = NULL, NULL);
@@ -101,5 +108,3 @@ char	*get_next_line(int fd)
 		return (free(buf), free(line), NULL);
 	return (line);
 }
-
-

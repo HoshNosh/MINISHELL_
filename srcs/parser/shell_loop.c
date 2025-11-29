@@ -6,197 +6,104 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 17:26:20 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/22 12:05:25 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/28 23:03:06 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "expand_vars.h"
+#include "exec.h"
+#include "builtins.h"
+#include "expand.h"
 #include "lexer.h"
-#include "lexer_utils.h"
-#include "node_cmd.h"
+#include "node_commands.h"
 #include "parser.h"
 #include "print_ast.h"
-#include "shell_loop.h"
-#include "syntax_check.h"
-#include "syntax_validation.h"
+#include "shell.h"
+#include "syntax.h"
 
 /*
-** Lit la saisie utilisateur avec readline.
-** Affiche le prompt "minishell$ " et attend une entrée.
-** Ajoute la ligne à l'historique si elle n'est pas vide.
+** Lit l'entrée utilisateur avec readline ou get_next_line.
+** Affiche le prompt "minishell$ " si terminal interactif.
 */
-/* static  */char	*read_input(t_mother_shell *shell)
+char	*read_input(t_mother_shell *shell)
 {
-	shell->line = readline("minishell$ ");
+	char	*line;
 
-	if (shell->line && *shell->line != '\0')
-		add_history(shell->line);
+	if (isatty(STDIN_FILENO))
+	{
+		shell->line = readline("minishell$ ");
+		if (shell->line && *shell->line != '\0')
+			add_history(shell->line);
+	}
+	else
+	{
+		line = get_next_line(STDIN_FILENO);
+		if (line && line[ft_strlen(line) - 1] == '\n')
+			line[ft_strlen(line) - 1] = '\0';
+		shell->line = line;
+	}
 	return (shell->line);
 }
 
 /*
-** Prépare les tokens pour l'exec (lexing, validation, expansion).
-** Fait l'analyse lexicale, check la syntaxe et expanse les var.
-** Return 1 en cas de succès, 0 et msg si erreur.
+** Gère le statut du signal SIGINT reçu.
+** Met à jour last_status à 130 si CTRL-C détecté.
 */
-/* static  */int	prepare_tokens(char *line, char ***expanded_tokens,
-t_mother_shell *shell)
-{
-	char			**tokens;
-	t_expand_ctx	ctx;
-
-	tokens = lexer_split(line);
-	if (!tokens)
-	{
-		printf("Lexer error : quotes not closed or failed malloc\n");
-		return (0);
-	}
-	if (!validate_syntax(tokens))
-	{
-		ft_putstr_fd("minishell: syntax error near unexpected token\n", 2);
-		shell->last_status = 2;
-		free_tokens(tokens);
-		return (0);
-	}
-	ctx.env = shell->env;
-	ctx.last_exit_code = shell->last_status;
-	*expanded_tokens = expand_tokens(tokens, &ctx);
-	free_tokens(tokens);
-	if (!*expanded_tokens)
-		return (0);
-	return (1);
-}
-
-/*
-** Traite une ligne de cmd complète. Prépare les tokens, construit l'AST et
-** l'affiche pour debug. Free tte la mémoire allouée après traitement.
-*/
-/* static  */void	process_line(char *line, t_mother_shell *shell)
-{
-	char	**expanded_tokens;
-	//char	*tmp_file;
-
-	if (shell->last_expanded_tokens)
-	{
-		free_tokens(shell->last_expanded_tokens);
-		shell->last_expanded_tokens = NULL;
-	}
-	if (!prepare_tokens(line, &expanded_tokens, shell))
-		return ;
-	shell->last_expanded_tokens = expanded_tokens;
-	shell->ast = parse_tokens(expanded_tokens);
-	if (shell->ast)
-	{
-		read_heredocs_before_exec(shell->ast);
-		execute_ast(shell->ast, shell);
-		free_node(shell->ast);
-		shell->ast = NULL;
-	}
-	free_tokens(expanded_tokens);
-	shell->last_expanded_tokens = NULL;
-	return ;
-}
-
-
-
-/*
-** Traite une ligne de cmd complète. Prépare les tokens, construit l'AST et
-** l'affiche pour debug. Free tte la mémoire allouée après traitement.
-*/
-/*static  void	process_line(char *line, t_mother_shell *shell)
-/{
-	char	**expanded_tokens;
-
-	if (shell->last_expanded_tokens)
-	{
-		free_tokens(shell->last_expanded_tokens);
-		shell->last_expanded_tokens = NULL;
-	}
-	if (!prepare_tokens(line, &expanded_tokens, shell))
-		return ;
-	shell->last_expanded_tokens = expanded_tokens;
-	shell->ast = parse_tokens(expanded_tokens);
-	if (shell->ast)
-	{
-		read_heredocs_before_exec(shell->ast);
-		execute_ast(shell->ast, shell);
-		free_node(shell->ast);
-		shell->ast = NULL;
-	}
-	free_tokens(expanded_tokens);
-	shell->last_expanded_tokens = NULL;
-	return ;
-}*/
-
-/* static  */void	handle_signal_status(t_mother_shell *shell)
+void	handle_signal_status(t_mother_shell *shell)
 {
 	if (g_sigint_received == SIGINT)
 	{
-
 		shell->last_status = 130;
 		g_sigint_received = 0;
 	}
 }
 
 /*
-** Boucle principale du shell.
-** Lit en continu les cmd utilisateur jusqu'à EOF ou exit.
-** Traite chaque ligne non vide et gère la sortie propre du programme.
+** Nettoie la ligne vide et continue la boucle.
+** Free la ligne et return 1 pour continuer.
 */
-void	shell_loop(t_mother_shell *shell)
+static int	handle_empty_line(t_mother_shell *shell)
 {
-	while (1)
+	free(shell->line);
+	return (1);
+}
+
+/*
+** Gère la sortie du shell (EOF ou erreur syntaxe non-interactif).
+** Libère les tokens expandés si nécessaire.
+*/
+static void	handle_shell_exit(t_mother_shell *shell)
+{
+	if (shell->last_expanded_tokens)
 	{
-		read_input(shell);
-		handle_signal_status(shell);
-		if (!shell->line)
-		{
-			if (shell->last_expanded_tokens)
-			{
-				free_tokens(shell->last_expanded_tokens);
-				shell->last_expanded_tokens = NULL;
-			}
-			//rl_clear_history();
-			return ;
-		}
-		if (*shell->line == '\0')
-		{
-			free(shell->line);
-			continue ;
-		}
-		process_line(shell->line, shell);
-		free(shell->line);
+		free_tokens(shell->last_expanded_tokens);
+		shell->last_expanded_tokens = NULL;
 	}
 }
 
-
 /*
 ** Boucle principale du shell.
-** Lit en continu les cmd utilisateur jusqu'à EOF ou exit.
-** Traite chaque ligne non vide et gère la sortie propre du programme.
-*
+** Lit et traite les commandes jusqu'à EOF ou exit.
+*/
 void	shell_loop(t_mother_shell *shell)
 {
+	int	should_continue;
+
 	while (1)
 	{
 		read_input(shell);
 		handle_signal_status(shell);
 		if (!shell->line)
-		{
-			if (shell->last_expanded_tokens)
-			{
-				free_tokens(shell->last_expanded_tokens);
-				shell->last_expanded_tokens = NULL;
-			}
-			return ;
-		}
+			return (handle_shell_exit(shell));
 		if (*shell->line == '\0')
 		{
-			free(shell->line);
-			continue ;
+			if (handle_empty_line(shell))
+				continue ;
 		}
-		process_line(shell->line, shell);
+		should_continue = process_line(shell->line, shell);
 		free(shell->line);
+		shell->line = NULL;
+		if (!should_continue)
+			return ;
 	}
-}*/
+}

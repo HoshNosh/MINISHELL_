@@ -6,11 +6,12 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 12:26:27 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/16 17:54:06 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/29 20:18:02 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "exec.h"
+#include "builtins.h"
 
 /*
 ** Vérifie que le chemin donné correspond à un exécutable valide :
@@ -53,6 +54,8 @@ char	**get_path_tab(char **env)
 	int		i;
 	int		j;
 
+	if (!env)
+		return (NULL);
 	i = 0;
 	while (env[i])
 	{
@@ -86,22 +89,14 @@ char	*ft_join_path(char *cmd, char *path)
 }
 
 /*
-** Cherche le chemin absolu d’une commande :
-** - Si la commande contient déjà un '/', on la retourne telle quelle.
-** - Sinon, on parcourt chaque dossier du PATH pour trouver le binaire.
-** Renvoie le chemin trouvé ou NULL si la commande est introuvable.
+** Cherche dans les chemins PATH pour trouver la commande.
+** Retourne le chemin complet si trouvé, NULL sinon.
 */
-char	*get_path(char *cmd, char **env)
+static char	*search_in_paths(char *cmd, char **paths)
 {
-	char	**paths;
 	char	*path;
 	int		i;
 
-	if (ft_strchr(cmd, '/'))
-		return (ft_strdup(cmd));
-	paths = get_path_tab(env);
-	if (!paths)
-		return (NULL);
 	i = 0;
 	while (paths[i])
 	{
@@ -116,4 +111,26 @@ char	*get_path(char *cmd, char **env)
 	}
 	ft_free_tab(paths);
 	return (NULL);
+}
+
+/*
+** Cherche le chemin absolu d'une commande :
+** - Si la commande contient déjà un '/', on la retourne telle quelle.
+** - Sinon, on parcourt chaque dossier du PATH pour trouver le binaire.
+** - Si PATH n'existe pas, on utilise le PATH par défaut de bash.
+** Renvoie le chemin trouvé ou NULL si la commande est introuvable.
+*/
+char	*get_path(char *cmd, char **env)
+{
+	char	**paths;
+
+	if (ft_strchr(cmd, '/'))
+		return (ft_strdup(cmd));
+	paths = get_path_tab(env);
+	if (!paths)
+		paths = ft_split("/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:"
+				"/sbin:/bin:.", ':');
+	if (!paths)
+		return (NULL);
+	return (search_in_paths(cmd, paths));
 }

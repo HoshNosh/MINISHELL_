@@ -6,13 +6,13 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 03:44:30 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/02 15:00:15 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/28 21:26:01 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "syntax_validation.h"
-#include "parser_redir.h"
+#include "syntax.h"
+#include "parser.h"
 
 /*
 ** Check si token est un opérateur pipe. Compare le token avec le char "|".
@@ -23,6 +23,8 @@ int	is_pipe(char *token)
 	int	i;
 
 	if (!token)
+		return (0);
+	if (token[0] == '\x01')
 		return (0);
 	i = 0;
 	while (token[i])

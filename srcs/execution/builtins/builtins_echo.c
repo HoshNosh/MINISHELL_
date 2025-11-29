@@ -6,11 +6,11 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 14:14:42 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/19 14:35:04 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/28 21:59:57 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "builtins.h"
 
 void	ft_parse_flags(char **tokens, size_t *i, int *print_newline)
 {

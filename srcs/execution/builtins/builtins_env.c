@@ -6,11 +6,11 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:55:19 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/22 14:28:56 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/28 22:00:15 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "builtins.h"
 
 char	*ft_strdup2(char *src, int n)
 {
@@ -23,11 +23,26 @@ char	*ft_strdup2(char *src, int n)
 	return (dup);
 }
 
-int	ft_env(char **envp, int output_fd, char **argv)
+static void	ft_print_env_loop(char **envp, int output_fd)
 {
 	int	i;
 
 	i = 0;
+	while (envp[i])
+	{
+		if (output_fd)
+		{
+			ft_putstr_fd(envp[i], output_fd);
+			ft_putstr_fd("\n", output_fd);
+		}
+		else
+			printf("%s\n", envp[i]);
+		i++;
+	}
+}
+
+int	ft_env(char **envp, int output_fd, char **argv)
+{
 	if (argv[1])
 	{
 		ft_putstr_fd("env: ", STDERR_FILENO);
@@ -35,20 +50,9 @@ int	ft_env(char **envp, int output_fd, char **argv)
 		ft_putendl_fd(" No such file or directory", STDERR_FILENO);
 		return (1);
 	}
-	else
-	{
-		while (envp[i])
-		{
-			if (output_fd)
-			{
-				ft_putstr_fd(envp[i], output_fd);
-				ft_putstr_fd("\n", output_fd);
-			}
-			else
-				printf("%s\n", envp[i]);
-			i++;
-		}
-	}
+	if (!envp)
+		return (0);
+	ft_print_env_loop(envp, output_fd);
 	return (0);
 }
 
@@ -65,7 +69,7 @@ static char	*ft_get_pwd_env(void)
 	return (ft_strdup("PWD=/"));
 }
 
-char **ft_minimal_env(char **envp)
+char	**ft_minimal_env(char **envp)
 {
 	char	**minimal_env;
 	char	*pwd_str;

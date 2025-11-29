@@ -6,13 +6,13 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 11:41:06 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/19 13:49:09 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/29 15:46:29 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "builtins.h"
 
-int	ft_isbuiltin(char *str)
+static int	ft_is_builtin1(char *str)
 {
 	if (ft_strncmp(str, "echo", 4) == 0 && ft_strlen(str) == 4)
 		return (1);
@@ -22,7 +22,14 @@ int	ft_isbuiltin(char *str)
 		return (1);
 	else if (ft_strncmp(str, "export", 6) == 0 && ft_strlen(str) == 6)
 		return (1);
-	else if (ft_strncmp(str, "unset", 5) == 0 && ft_strlen(str) == 5)
+	return (0);
+}
+
+int	ft_is_builtin(char *str)
+{
+	if (ft_is_builtin1(str))
+		return (1);
+	if (ft_strncmp(str, "unset", 5) == 0 && ft_strlen(str) == 5)
 		return (1);
 	else if (ft_strncmp(str, "env", 3) == 0 && ft_strlen(str) == 3)
 		return (1);
@@ -33,30 +40,6 @@ int	ft_isbuiltin(char *str)
 	return (0);
 }
 
-void	ft_exebuiltin(char **tokens, char ***envp, int *exit_status, int fd, t_mother_shell *shell)
-{
-	*exit_status = 0;
-	if (ft_strcmp(tokens[0], "echo") == 0)
-		ft_echo(tokens, fd);
-	else if (ft_strcmp(tokens[0], "pwd") == 0)
-		ft_pwd(fd, tokens, exit_status);
-	else if (ft_strcmp(tokens[0], "env") == 0)
-	{
-		if (ft_env(*envp, fd, tokens))
-			ft_exit(tokens, exit_status, shell);
-	}
-	else if (ft_strcmp(tokens[0], "cd") == 0)
-		ft_cd_invalid_opt(tokens, exit_status, *envp);
-	else if (ft_strcmp(tokens[0], "export") == 0)
-		*envp = ft_export(*envp, tokens, exit_status, fd);
-	else if (ft_strcmp(tokens[0], "unset") == 0)
-		*envp = ft_unset(*envp, tokens, exit_status);
-	else if (ft_strcmp(tokens[0], "exit") == 0)
-		ft_exit(tokens, exit_status, shell);
-	else if (ft_strcmp(tokens[0], ":") == 0)
-		return ;
-}
-
 int	ft_error_builtin(char *path, char *error, int error_code, int *exit_code)
 {
 	ft_puterror(path, NULL, error);
@@ -64,10 +47,20 @@ int	ft_error_builtin(char *path, char *error, int error_code, int *exit_code)
 	return (0);
 }
 
-int	ft_check_path_builtin(char *path, int *exit_code)
+static int	ft_check_directory(char *path, int *exit_code)
 {
 	struct stat	file_stat;
 
+	if (stat(path, &file_stat) != -1)
+	{
+		if (S_ISDIR(file_stat.st_mode))
+			return (ft_error_builtin(path, "Is a directory", 126, exit_code));
+	}
+	return (0);
+}
+
+int	ft_check_path_builtin(char *path, int *exit_code)
+{
 	if (!ft_strchr(path, '/'))
 	{
 		if (access(path, F_OK) != 0)
@@ -78,24 +71,11 @@ int	ft_check_path_builtin(char *path, int *exit_code)
 		if (access(path, F_OK) != 0)
 			return (ft_error_builtin(path, strerror(errno), 127, exit_code));
 	}
-	if (stat(path, &file_stat) != -1)
+	if (ft_check_directory(path, exit_code) == 0)
 	{
-		if (S_ISDIR(file_stat.st_mode))
-			return (ft_error_builtin(path, "Is a directory", 126, exit_code));
+		if (access(path, X_OK) != 0)
+			return (ft_error_builtin(path, "Permission denied", 126,
+					exit_code));
 	}
-	if (access(path, X_OK) != 0)
-		return (ft_error_builtin(path, "Permission denied", 126, exit_code));
 	return (1);
 }
-
-/*int	ft_check_redirection(t_command *command, int *exit_code)
-{
-	int	flag;
-
-	flag = 1;
-	if (command->input_fd == -1)
-		flag = ft_check_path_builtin(command->input_file, exit_code);
-	if (command->output_fd == -1)
-		flag = ft_check_path_builtin(command->output_file, exit_code);
-	return (flag);
-}*/

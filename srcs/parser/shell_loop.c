@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 17:26:20 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/28 23:03:06 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/30 19:27:58 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ void	handle_signal_status(t_mother_shell *shell)
 static int	handle_empty_line(t_mother_shell *shell)
 {
 	free(shell->line);
+	shell->line = NULL;
 	return (1);
 }
 
@@ -79,6 +80,7 @@ static void	handle_shell_exit(t_mother_shell *shell)
 		free_tokens(shell->last_expanded_tokens);
 		shell->last_expanded_tokens = NULL;
 	}
+	rl_clear_history();
 }
 
 /*

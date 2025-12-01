@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 13:29:02 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/28 22:09:50 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/30 18:31:19 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,12 +26,12 @@ extern void	rl_replace_line(const char *str, int n);
 ** Affiche nouvelle ligne et redémarre l'invite de commande.
 ** Utilise readline pour maintenir l'état de l'interface utilisateur.
 */
-static void	sig_handler(int sig)
+void	sig_handler(int sig)
 {
 	g_sigint_received = sig;
 	write(1, "\n", 1);
-	rl_replace_line("", 0);
 	rl_on_new_line();
+	rl_replace_line("", 0);
 	rl_redisplay();
 }
 
@@ -84,42 +84,6 @@ static void	init_shell(t_mother_shell *shell, char **envp)
 	copy_env_vars(shell, envp, i);
 }
 
-
-/*static void	init_shell(t_mother_shell *shell, char **envp)
-{
-	int	i;
-	int	j;
-
-	if (!envp || !envp[0])
-	{
-		shell->env = ft_minimal_env(envp);
-		return ;
-	}
-
-	shell->ast = NULL;
-	shell->line = NULL;
-	shell->last_status = 0;
-	shell->last_expanded_tokens = NULL;
-	i = 0;
-	while (envp[i])
-		i++;
-	shell->env = malloc(sizeof(char *) * (i + 1));
-	if (!shell->env)
-		exit(1);
-	j = 0;
-	while (j < i)
-	{
-		shell->env[j] = ft_strdup(envp[j]);
-		if (!shell->env[j] || ft_strlen(shell->env[j]) != ft_strlen(envp[j]))
-		{
-			fprintf(stderr, "Error: env var truncated: %s\n", envp[j]);
-			exit(1);
-		}
-		j++;
-	}
-	shell->env[i] = NULL;
-}*/
-
 /*
 ** Free tte la mémoire allouée pour la struct du shell.
 ** Free chaque var d'env puis le tab principal.
@@ -168,3 +132,39 @@ int	main(int argc, char **argv, char **envp)
 	free_shell(&shell);
 	return (shell.last_status);
 }
+
+
+/*static void	init_shell(t_mother_shell *shell, char **envp)
+{
+	int	i;
+	int	j;
+
+	if (!envp || !envp[0])
+	{
+		shell->env = ft_minimal_env(envp);
+		return ;
+	}
+
+	shell->ast = NULL;
+	shell->line = NULL;
+	shell->last_status = 0;
+	shell->last_expanded_tokens = NULL;
+	i = 0;
+	while (envp[i])
+		i++;
+	shell->env = malloc(sizeof(char *) * (i + 1));
+	if (!shell->env)
+		exit(1);
+	j = 0;
+	while (j < i)
+	{
+		shell->env[j] = ft_strdup(envp[j]);
+		if (!shell->env[j] || ft_strlen(shell->env[j]) != ft_strlen(envp[j]))
+		{
+			fprintf(stderr, "Error: env var truncated: %s\n", envp[j]);
+			exit(1);
+		}
+		j++;
+	}
+	shell->env[i] = NULL;
+}*/

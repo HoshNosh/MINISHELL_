@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:37:50 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/29 16:51:03 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/30 18:34:40 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,15 @@ void	handle_wait_status(t_mother_shell *shell, int status)
 			ft_putstr_fd("Quit (core dumped)", STDERR_FILENO);
 			ft_putendl_fd(RESET, STDERR_FILENO);
 		}
+		// 2. CORRECTION : Ajouter un saut de ligne après tout signal
+        // (y compris SIGINT) pour que le nouveau prompt s'affiche
+        // sur la ligne suivante, comme le ferait Bash.
+        if (isatty(STDERR_FILENO)) // Vérification optionnelle mais recommandée
+        {
+            // Nous utilisons STDERR_FILENO pour les sorties de statut.
+            // Si vous préférez STDOUT_FILENO pour un simple saut de ligne, c'est aussi acceptable.
+            ft_putstr_fd("\n", STDERR_FILENO);
+        }
 	}
 }
 

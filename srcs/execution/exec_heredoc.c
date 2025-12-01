@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 12:31:26 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/29 15:49:06 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/30 13:54:53 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,3 +109,16 @@ int	get_heredoc(t_command *command)
 	}
 	return (tmpfile_fd);
 }
+
+/*
+** Affiche le warning EOF pour heredoc.
+*/
+void	print_eof_warning(char *limiter_n)
+{
+	ft_putstr_fd("\n", 1);
+	ft_putstr_fd("minishell: warning: here-document delimited by ", 2);
+	ft_putstr_fd("end-of-file (wanted `", 2);
+	write(2, limiter_n, ft_strlen(limiter_n) - 1);
+	ft_putstr_fd("')\n", 2);
+}
+

@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 17:51:23 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/28 21:13:57 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/30 12:28:11 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ static void	fill_split_result(char **result, char *str)
 	int	i;
 	int	count;
 	int	start;
+	char	*word;
 
 	i = 0;
 	count = 0;
@@ -79,7 +80,10 @@ static void	fill_split_result(char **result, char *str)
 			while (str[i] && str[i] != ' ' && str[i] != '\t'
 				&& str[i] != '\n')
 				i++;
-			result[count] = ft_substr(str, start, i - start);
+			word = ft_substr(str, start, i -start);
+			if (!word)
+				word = ft_strdup("");
+			result[count] = word;
 			count++;
 		}
 	}
@@ -122,7 +126,11 @@ int	add_split_words(char **split_result, char **exp, int j, int max)
 		{
 			if (j >= max)
 				return (-1);
+			if (!split_result[k])
+				continue ;
 			exp[j] = ft_strdup(split_result[k]);
+			if (!exp[j])
+				return (-1);
 			exp[j] = clean_escape_markers(exp[j]);
 			j++;
 		}

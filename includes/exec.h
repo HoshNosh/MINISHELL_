@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 21:56:01 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/29 20:33:01 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/30 13:55:17 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ char	*ft_get_heredoc_filename(int index);
 //void read_heredoc_content(char *limiter_n, int tmpfile_fd);
 void	heredoc_sigint_handler(int sig);
 //void	read_heredocs_before_exec(t_node *node);
-
+void	print_eof_warning(char *limiter_n);
 
 /* EXEX PATH */
 void	ft_check_path(char *path, t_command *command);

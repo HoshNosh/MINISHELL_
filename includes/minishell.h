@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 13:28:09 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/28 22:12:06 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/11/30 18:31:07 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,6 @@ typedef struct s_builtin_ctx
 extern void	rl_replace_line(const char *str, int n);
 extern volatile sig_atomic_t	g_sigint_received;
 
-
+void    sig_handler(int sig);
 
 #endif

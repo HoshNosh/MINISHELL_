@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 15:37:50 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/30 18:34:40 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/03 17:18:43 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	check_empty_or_special(t_node *node, t_mother_shell *shell)
 {
 	if (node->command->argv[0][0] == '\0')
 	{
-		ft_putstr_fd(": command not found\n", 2);
+		//ft_putstr_fd(": command not found\n", 2);
 		shell->last_status = 127;
 		return (1);
 	}

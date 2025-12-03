@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/21 14:12:50 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/28 22:00:59 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/03 20:27:04 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,13 +79,18 @@ char	**ft_duplicate_env(char **envp)
 	if (!new_env)
 		ft_dup_error_exit("minishell: malloc");
 	i = 0;
+	while (i <= size)
+		new_env[i++] = NULL;
+	i = 0;
 	while (envp[i])
 	{
 		new_env[i] = ft_strdup(envp[i]);
 		if (!new_env[i])
+		{
+			ft_free_tab(new_env);
 			ft_dup_error_exit("minishell: ft_strdup");
+		}
 		i++;
 	}
-	new_env[size] = NULL;
 	return (new_env);
 }

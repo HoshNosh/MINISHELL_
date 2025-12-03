@@ -13,7 +13,7 @@
 #ifndef EXPAND_H
 # define EXPAND_H
 
-# include "minishell.h"
+#include "minishell.h"
 
 typedef struct s_expand_ctx
 {

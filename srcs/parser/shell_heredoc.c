@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 17:26:20 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/29 18:57:12 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/03 20:51:52 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,16 +57,20 @@ static int	open_heredoc_file(char **tmp_filename)
 ** Lit le contenu du heredoc et l'écrit dans le fichier.
 ** Gère le limiteur avec newline. Return 0 succès, -1 si CTRL-C.
 */
-static int	write_heredoc_content(t_redirect *r, int fd)
+static int	write_heredoc_content(t_redirect *r, int fd, t_expand_ctx *ctx)
 {
 	char	*original_filename;
 	char	*limiter;
 	int		result;
 
 	original_filename = ft_strdup(r->filename);
+	if (!original_filename)
+		return (-1);
 	limiter = ft_strjoin(original_filename, "\n");
 	free(original_filename);
-	result = read_heredoc_content(limiter, fd);
+	if (!limiter)
+		return (-1);
+	result = read_heredoc_content(limiter, fd, ctx);
 	free(limiter);
 	return (result);
 }
@@ -94,7 +98,7 @@ static void	finalize_heredoc(t_redirect *r, char *tmp, int is_last)
 ** Comportement bash: tous les heredocs sont lus, seul le dernier est utilisé.
 ** Return 0 succès, -1 si CTRL-C.
 */
-int	process_heredoc_redir(t_redirect *r, int *is_last)
+int	process_heredoc_redir(t_redirect *r, int *is_last, t_expand_ctx *ctx)
 {
 	char	*tmp;
 	int		fd;
@@ -103,7 +107,7 @@ int	process_heredoc_redir(t_redirect *r, int *is_last)
 	fd = open_heredoc_file(&tmp);
 	if (fd == -1)
 		return (-1);
-	result = write_heredoc_content(r, fd);
+	result = write_heredoc_content(r, fd, ctx);
 	close(fd);
 	if (result == -1)
 	{

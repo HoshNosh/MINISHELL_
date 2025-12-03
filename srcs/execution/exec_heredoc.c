@@ -6,11 +6,12 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 12:31:26 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/30 13:54:53 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/03 19:52:14 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "exec.h"
+#include "expand.h"
 
 /*
 ** Ouvre un fichier selon le mode demandé.
@@ -62,12 +63,12 @@ char	*ft_get_heredoc_filename(int index)
 ** pour le rediriger plus tard sur STDIN.
 */
 static int	create_tmp_file(t_command *command, t_redirect *cur, char *tmp_path,
-	int tmpfile_fd)
+	int tmpfile_fd, t_expand_ctx *ctx)
 {
 	int		write_fd;
 
 	write_fd = ft_open_file(tmp_path, 0, command);
-	read_heredoc_content(cur->filename, write_fd);
+	read_heredoc_content(cur->filename, write_fd, ctx);
 	close(write_fd);
 	if (!cur->next || cur->next->type != REDIR_HEREDOC)
 	{
@@ -85,7 +86,7 @@ static int	create_tmp_file(t_command *command, t_redirect *cur, char *tmp_path,
 ** - garde le dernier heredoc ouvert en lecture (pour stdin)
 ** - supprime les fichiers temporaires (unlink)
 */
-int	get_heredoc(t_command *command)
+int	get_heredoc(t_command *command, t_expand_ctx *ctx)
 {
 	t_redirect	*cur;
 	int			i;
@@ -102,7 +103,7 @@ int	get_heredoc(t_command *command)
 			tmp_path = ft_get_heredoc_filename(i++);
 			if (!tmp_path)
 				ft_exit_free("heredoc filename", EXIT_FAILURE, command);
-			tmpfile_fd = create_tmp_file(command, cur, tmp_path, tmpfile_fd);
+			tmpfile_fd = create_tmp_file(command, cur, tmp_path, tmpfile_fd, ctx);
 			free(tmp_path);
 		}
 		cur = cur->next;

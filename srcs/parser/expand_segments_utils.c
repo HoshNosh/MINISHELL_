@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 17:51:23 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/29 19:13:19 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/03 21:00:49 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,15 @@
 static int	add_word(t_segment_ctx *ctx, char *word, int is_last, int ends_ifs)
 {
 	char	*piece;
+	char	*old_current = *ctx->current;
 
 	piece = ft_strdup(word);
 	if (!piece)
 		return (-1);
 	if (*ctx->current)
 		piece = append_piece(*ctx->current, piece);
+	if (!piece && old_current)
+		return (free(old_current), -1);
 	if (!is_last || ends_ifs)
 	{
 		if (!piece || *ctx->j >= ctx->max)

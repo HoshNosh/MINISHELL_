@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:54:53 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/28 21:58:39 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/03 20:02:17 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,16 @@ void	ft_update_oldpwd_var(char ***envp, char *oldpwd)
 	if (!oldpwd)
 		return ;
 	key = ft_strdup("OLDPWD");
+	if (!key)
+		return ;
 	value = ft_strdup(oldpwd);
-	if (key && value)
+	if (!value)
 	{
-		if (!ft_replace_env_var(*envp, key, value))
-			ft_add_new_env_var(envp, key, value);
+		free(key);
+		return ;
 	}
+	if (!ft_replace_env_var(*envp, key, value))
+		ft_add_new_env_var(envp, key, value);
 }
 
 void	ft_update_pwd_var(char ***envp)
@@ -37,12 +41,16 @@ void	ft_update_pwd_var(char ***envp)
 	if (getcwd(cwd, sizeof(cwd)))
 	{
 		key = ft_strdup("PWD");
+		if (!key)
+		return ;
 		value = ft_strdup(cwd);
-		if (key && value)
+		if (!value)
 		{
-			if (!ft_replace_env_var(*envp, key, value))
-				ft_add_new_env_var(envp, key, value);
+			free(key);
+			return ;
 		}
+		if (!ft_replace_env_var(*envp, key, value))
+			ft_add_new_env_var(envp, key, value);
 	}
 }
 

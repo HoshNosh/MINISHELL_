@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 13:29:02 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/30 18:31:19 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/03 20:35:29 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ void	sig_handler(int sig)
 static void	copy_env_vars(t_mother_shell *shell, char **envp, int env_count)
 {
 	int	j;
+	int	k;
 
 	j = 0;
 	while (j < env_count)
@@ -49,6 +50,13 @@ static void	copy_env_vars(t_mother_shell *shell, char **envp, int env_count)
 		shell->env[j] = ft_strdup(envp[j]);
 		if (!shell->env[j] || ft_strlen(shell->env[j]) != ft_strlen(envp[j]))
 		{
+			k = 0;
+			while (k < j)
+			{
+				free(shell->env[k]);
+				k++;
+			}
+			free(shell->env);
 			fprintf(stderr, "Error: env var truncated: %s\n", envp[j]);
 			exit(1);
 		}
@@ -57,14 +65,14 @@ static void	copy_env_vars(t_mother_shell *shell, char **envp, int env_count)
 	shell->env[env_count] = NULL;
 }
 
+
 /*
-** Initialise la struct principale du shell.
-** Copie les var d'env et initialise les champs de base.
-** Alloue la mémoire nécessaire pour l'env du shell.
+** Version corrigée de la section critique de init_shell.
+** Utilise ft_strdup pour ajouter PATH manuellement si l'environnement est vide.
 */
-static void	init_shell(t_mother_shell *shell, char **envp)
+static void init_shell(t_mother_shell *shell, char **envp)
 {
-	int	i;
+	int i;
 
 	shell->ast = NULL;
 	shell->line = NULL;
@@ -73,6 +81,7 @@ static void	init_shell(t_mother_shell *shell, char **envp)
 	if (!envp || !envp[0])
 	{
 		shell->env = ft_minimal_env(envp);
+			exit(1);
 		return ;
 	}
 	i = 0;
@@ -81,8 +90,14 @@ static void	init_shell(t_mother_shell *shell, char **envp)
 	shell->env = malloc(sizeof(char *) * (i + 1));
 	if (!shell->env)
 		exit(1);
+	int j = 0;
+	while (j <= i)
+		shell->env[j++] = NULL;
 	copy_env_vars(shell, envp, i);
 }
+
+
+
 
 /*
 ** Free tte la mémoire allouée pour la struct du shell.
@@ -132,39 +147,3 @@ int	main(int argc, char **argv, char **envp)
 	free_shell(&shell);
 	return (shell.last_status);
 }
-
-
-/*static void	init_shell(t_mother_shell *shell, char **envp)
-{
-	int	i;
-	int	j;
-
-	if (!envp || !envp[0])
-	{
-		shell->env = ft_minimal_env(envp);
-		return ;
-	}
-
-	shell->ast = NULL;
-	shell->line = NULL;
-	shell->last_status = 0;
-	shell->last_expanded_tokens = NULL;
-	i = 0;
-	while (envp[i])
-		i++;
-	shell->env = malloc(sizeof(char *) * (i + 1));
-	if (!shell->env)
-		exit(1);
-	j = 0;
-	while (j < i)
-	{
-		shell->env[j] = ft_strdup(envp[j]);
-		if (!shell->env[j] || ft_strlen(shell->env[j]) != ft_strlen(envp[j]))
-		{
-			fprintf(stderr, "Error: env var truncated: %s\n", envp[j]);
-			exit(1);
-		}
-		j++;
-	}
-	shell->env[i] = NULL;
-}*/

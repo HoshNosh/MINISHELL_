@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 21:56:01 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/30 13:55:17 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/01 11:50:43 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define EXEC_H
 
 #include "minishell.h"
+#include "expand.h"
 
 
 /* ========== exec_commande_utils.c ========== */
@@ -62,8 +63,10 @@ int	check_and_handle_assignment(t_node *node, t_mother_shell *shell);
 
 
 /* EXEC HEREDOC AND READ */
-int	read_heredoc_content(char *limiter_n, int tmpfile_fd);
-int	get_heredoc(t_command *command);
+int	read_heredoc_content(char *limiter_n, int tmpfile_fd, t_expand_ctx *ctx);
+//int	read_heredoc_content(char *limiter_n, int tmpfile_fd);
+int	get_heredoc(t_command *command, t_expand_ctx *ctx);
+//int	get_heredoc(t_command *command);
 char	*ft_get_heredoc_filename(int index);
 //void	prepare_heredocs(t_node *node);
 //void read_heredoc_content(char *limiter_n, int tmpfile_fd);

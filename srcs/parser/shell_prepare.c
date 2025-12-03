@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 17:26:20 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/29 19:03:58 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/01 11:39:11 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ int	execute_and_cleanup_ast(t_mother_shell *shell)
 
 	if (!shell->ast)
 		return (0);
-	result = read_heredocs_before_exec(shell->ast);
+	result = read_heredocs_before_exec(shell->ast, shell);
 	if (result == -1)
 	{
 		g_sigint_received = 0;

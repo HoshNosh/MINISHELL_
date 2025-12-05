@@ -6,13 +6,17 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 20:18:14 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/29 15:50:37 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 09:17:58 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "exec.h"
 #include "lexer.h"
 
+/*
+** Nettoie et quitte depuis un processus enfant de pipe.
+** Libère tokens, shell, historique et ferme fd hérités.
+*/
 static void	cleanup_and_exit(t_mother_shell *shell, int status)
 {
 	if (shell && shell->last_expanded_tokens)
@@ -27,6 +31,10 @@ static void	cleanup_and_exit(t_mother_shell *shell, int status)
 	exit(status);
 }
 
+/*
+** Exécute la partie gauche du pipe dans un processus enfant.
+** Redirige stdout vers le pipe, exécute l'AST puis quitte.
+*/
 static void	execute_pipe_left(t_node *node, t_mother_shell *shell, int *pipefd)
 {
 	signal(SIGINT, SIG_DFL);
@@ -37,6 +45,11 @@ static void	execute_pipe_left(t_node *node, t_mother_shell *shell, int *pipefd)
 	execute_ast(node->left, shell);
 	cleanup_and_exit(shell, shell->last_status);
 }
+
+/*
+** Exécute la partie droite du pipe dans un processus enfant.
+** Redirige stdin depuis le pipe, exécute l'AST puis quitte.
+*/
 
 static void	execute_pipe_right(t_node *node, t_mother_shell *shell, int *pipefd)
 {
@@ -49,6 +62,10 @@ static void	execute_pipe_right(t_node *node, t_mother_shell *shell, int *pipefd)
 	cleanup_and_exit(shell, shell->last_status);
 }
 
+/*
+** Gère le statut de sortie d'un processus pipe.
+** Affiche "Quit (core dumped)" si SIGQUIT.
+*/
 static void	handle_pipe_status(t_mother_shell *shell, int status)
 {
 	if (WIFEXITED(status))
@@ -65,6 +82,10 @@ static void	handle_pipe_status(t_mother_shell *shell, int status)
 	}
 }
 
+/*
+** Crée un pipe et fork deux processus pour gauche et droite.
+** Ferme les fd du pipe dans le parent et attend les deux enfants.
+*/
 int	execute_pipe(t_node *node, t_mother_shell *shell)
 {
 	int		pipefd[2];

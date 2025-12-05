@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 13:28:09 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/30 18:31:07 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 12:47:43 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,8 +71,6 @@ typedef struct s_node
 	t_command		*command;
 }	t_node;
 
-
-
 /*MOTHER STRUCTURE*/
 
 typedef struct s_mother_shell
@@ -84,23 +82,21 @@ typedef struct s_mother_shell
 	char				**last_expanded_tokens;
 }	t_mother_shell;
 
-
 typedef struct s_builtin_ctx
 {
-	char	***envp;
-	int	*exit_status;
-	int	fd;
+	char			***envp;
+	int				*exit_status;
+	int				fd;
 	t_mother_shell	*shell;
 }	t_builtin_ctx;
 
-
 /****************************************************************/
-/*                       	FUNCTIONS                           */
+/*                       	MAIN.C                              */
 /****************************************************************/
 
-extern void	rl_replace_line(const char *str, int n);
 extern volatile sig_atomic_t	g_sigint_received;
-
-void    sig_handler(int sig);
+extern void	rl_replace_line(const char *str, int n);
+void		sig_handler(int sig);
+void		free_shell(t_mother_shell *shell);
 
 #endif

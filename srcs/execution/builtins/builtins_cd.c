@@ -6,12 +6,16 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:54:53 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/28 21:59:50 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 09:24:53 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 
+/*
+** Vérifie si la variable HOME existe dans env.
+** Retourne 1 si trouvée, 0 sinon.
+*/
 int	ft_tabchr_home(char **env)
 {
 	int	i;
@@ -28,6 +32,10 @@ int	ft_tabchr_home(char **env)
 	return (0);
 }
 
+/*
+** Récupère la valeur d'une variable d'environnement.
+** Retourne un pointeur vers la valeur ou NULL si non trouvée.
+*/
 char	*ft_getenv(char **env, char *var)
 {
 	int		i;
@@ -46,6 +54,10 @@ char	*ft_getenv(char **env, char *var)
 	return (NULL);
 }
 
+/*
+** Compte le nombre d'éléments dans un tableau de chaînes.
+** Retourne le nombre d'éléments avant NULL.
+*/
 int	tab_size(char **tab)
 {
 	int	i;
@@ -56,12 +68,20 @@ int	tab_size(char **tab)
 	return (i);
 }
 
+/*
+** Met à jour OLDPWD et PWD après un changement de répertoire.
+** Appelle les fonctions dédiées pour chaque variable.
+*/
 void	ft_update_pwd_vars(char ***envp, char *oldpwd)
 {
 	ft_update_oldpwd_var(envp, oldpwd);
 	ft_update_pwd_var(envp);
 }
 
+/*
+** Implémente la commande cd du shell.
+** Change de répertoire et gère les erreurs de permissions.
+*/
 void	ft_cd(char **tokens, int *exit_status, char ***envp)
 {
 	char	*path_to_go;

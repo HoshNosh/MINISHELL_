@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 17:51:23 by sdossa            #+#    #+#             */
-/*   Updated: 2025/12/03 21:24:43 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 10:49:15 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,36 +84,21 @@ int	extract_next_segment(char *temp, int i, int *is_quoted)
 ** Traite un segment quoté en nettoyant les markers.
 ** Return 0 si succès, -1 si erreur.
 */
-int process_quoted_segment(char *segment, char **current)
+int	process_quoted_segment(char *segment, char **current)
 {
-    char    *dup_segment;
-    char    *cleaned;
+	char	*dup_segment;
+	char	*cleaned;
 
-    // Protection essentielle : Si le segment est NULL, on ne fait rien mais on ne plante pas.
-    if (!segment)
-        return (0);
-
-    // 1. Dupliquer la chaîne (ft_strdup pourrait retourner NULL en cas d'échec malloc)
-    dup_segment = ft_strdup(segment);
-    if (!dup_segment)
-        return (-1); // Échec de malloc (à gérer)
-
-    // 2. Nettoyer les marqueurs
-    // IMPORTANT : clean_escape_markers doit libérer dup_segment si elle retourne NULL,
-    // ou vous devez le faire ici en cas d'échec. Nous assumons qu'elle retourne NULL en cas d'erreur.
-    cleaned = clean_escape_markers(dup_segment);
-
-    if (!cleaned)
-    {
-        // free(dup_segment); // Dépend si clean_escape_markers gère cette libération
-        return (-1); // Erreur lors du nettoyage
-    }
-
-    // 3. Ajouter à la chaîne courante
-    *current = append_piece(*current, cleaned);
-
-    // Assurez-vous que l'allocation et la gestion de la mémoire de *current et cleaned sont bien gérées
-    // par append_piece (ce qui est souvent le cas).
-
-    return (0);
+	if (!segment)
+		return (0);
+	dup_segment = ft_strdup(segment);
+	if (!dup_segment)
+		return (-1);
+	cleaned = clean_escape_markers(dup_segment);
+	if (!cleaned)
+	{
+		return (-1);
+	}
+	*current = append_piece(*current, cleaned);
+	return (0);
 }

@@ -6,12 +6,17 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 16:22:17 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/28 22:00:50 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 09:42:08 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
+#include <math.h>
 
+/*
+** Extrait la clé et la valeur d'une assignation (KEY=value).
+** Retourne 1 si succès, 0 si erreur ou pas de '='.
+*/
 int	ft_extract_key_value(char *token, char **key, char **value)
 {
 	char	*equal_sign;
@@ -30,6 +35,10 @@ int	ft_extract_key_value(char *token, char **key, char **value)
 	return (1);
 }
 
+/*
+** Remplace une variable existante dans l'environnement.
+** Retourne 1 si trouvée et remplacée, 0 sinon.
+*/
 int	ft_replace_env_var(char **envp, char *key, char *value)
 {
 	size_t	b;
@@ -56,6 +65,10 @@ int	ft_replace_env_var(char **envp, char *key, char *value)
 	return (0);
 }
 
+/*
+** Ajoute une nouvelle variable à l'environnement.
+** Réalloue le tableau env avec une entrée supplémentaire.
+*/
 int	ft_add_new_env_var(char ***envp, char *key, char *value)
 {
 	size_t	size;
@@ -77,6 +90,10 @@ int	ft_add_new_env_var(char ***envp, char *key, char *value)
 	return (1);
 }
 
+/*
+** Vérifie qu'un identifiant est valide pour export.
+** Doit commencer par lettre ou _, puis alphanum ou _.
+*/
 int	ft_check_identifier_single(char *token, int *exit_status)
 {
 	int	i;
@@ -101,6 +118,10 @@ int	ft_check_identifier_single(char *token, int *exit_status)
 	return (1);
 }
 
+/*
+** Implémente la commande export du shell.
+** Sans argument affiche env trié, avec arguments ajoute/modifie variables.
+*/
 char	**ft_export(char **envp, char **tokens, int *exit_status, int fd)
 {
 	size_t	i;

@@ -6,13 +6,12 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/31 14:17:19 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/28 21:42:07 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 11:16:30 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "syntax.h"
-#include "shell.h"
+#include "lexer.h"
 
 /*
 ** Check que les pipes ne sont pas en 1ère/dernière pos ou consécutifs.

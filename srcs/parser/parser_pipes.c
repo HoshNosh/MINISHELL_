@@ -6,17 +6,16 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/08 00:19:55 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/29 19:05:28 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 13:40:15 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
-#include "node_commands.h"
 
 /*
 ** Compte le nombre de pipes dans les tokens.
-** Return -1 si trop de pipes (>=9999), sinon le nombre.
+** Return -1 si trop de pipes (>=999), sinon le nombre.
 */
 static int	count_and_validate_pipes(char **tokens, int start)
 {
@@ -31,7 +30,7 @@ static int	count_and_validate_pipes(char **tokens, int start)
 			pipe_count++;
 		i++;
 	}
-	if (pipe_count >= 9999)
+	if (pipe_count >= 999)
 	{
 		ft_putstr_fd("minishell: too many pipes\n", 2);
 		return (-1);

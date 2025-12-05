@@ -6,13 +6,12 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 11:10:40 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/29 11:27:50 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 11:30:05 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "lexer.h"
-#include "shell.h"
 
 /*
 ** Gère l'avancement dans une quote ouverte.

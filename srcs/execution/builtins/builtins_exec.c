@@ -6,12 +6,16 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 11:41:06 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/12/03 17:33:08 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 09:36:35 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 
+/*
+** Exécute les builtins simples: echo, pwd, env.
+** Ces commandes ne modifient pas l'environnement.
+*/
 static void	ft_exec_simple_builtins(char **tokens, t_builtin_ctx *ctx)
 {
 	if (ft_strcmp(tokens[0], "echo") == 0)
@@ -20,12 +24,12 @@ static void	ft_exec_simple_builtins(char **tokens, t_builtin_ctx *ctx)
 		ft_pwd(ctx->fd, tokens, ctx->exit_status);
 	else if (ft_strcmp(tokens[0], "env") == 0)
 		*ctx->exit_status = ft_env(*ctx->envp, ctx->fd, tokens);
-	// {
-	// 	if (ft_env(*ctx->envp, ctx->fd, tokens))
-	// 		*ctx->exit_status = 1;
-	// }
 }
 
+/*
+** Exécute les builtins qui modifient l'environnement.
+** Traite cd, export et unset.
+*/
 static void	ft_exec_env_builtins(char **tokens, t_builtin_ctx *ctx)
 {
 	if (ft_strcmp(tokens[0], "cd") == 0)
@@ -36,6 +40,10 @@ static void	ft_exec_env_builtins(char **tokens, t_builtin_ctx *ctx)
 		*ctx->envp = ft_unset(*ctx->envp, tokens, ctx->exit_status);
 }
 
+/*
+** Dispatcher principal pour l'exécution des builtins.
+** Route vers le bon builtin selon le nom de commande.
+*/
 void	ft_exec_builtin(char **tokens, t_builtin_ctx *ctx)
 {
 	*ctx->exit_status = 0;

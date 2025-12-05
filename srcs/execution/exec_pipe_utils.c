@@ -6,13 +6,17 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/12 20:18:14 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/28 22:02:20 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 09:19:01 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "exec.h"
 #include "lexer.h"
 
+/*
+** Vérifie qu'un fichier de redirection peut être ouvert.
+** Retourne 1 si erreur, 0 si succès.
+*/
 static int	check_redir_file(t_redirect *current)
 {
 	int	fd;
@@ -33,6 +37,10 @@ static int	check_redir_file(t_redirect *current)
 	return (0);
 }
 
+/*
+** Parcourt et vérifie que toutes les redirections sont valides.
+** Retourne 1 si erreur, 0 si succès.
+*/
 int	check_redirections_validity(t_redirect *redir)
 {
 	t_redirect	*current;
@@ -47,6 +55,10 @@ int	check_redirections_validity(t_redirect *redir)
 	return (0);
 }
 
+/*
+** Point d'entrée principal pour exécuter l'AST.
+** Appelle execute_simple_command ou execute_pipe selon le type.
+*/
 int	execute_ast(t_node *node, t_mother_shell *shell)
 {
 	(void)shell;

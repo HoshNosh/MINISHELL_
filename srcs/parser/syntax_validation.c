@@ -6,12 +6,12 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/10 03:44:30 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/28 21:26:01 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 11:36:42 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "syntax.h"
+#include "lexer.h"
 #include "parser.h"
 
 /*

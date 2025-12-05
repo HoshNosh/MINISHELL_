@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 12:31:26 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/12/03 19:52:14 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 10:35:53 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,28 +63,24 @@ char	*ft_get_heredoc_filename(int index)
 ** pour le rediriger plus tard sur STDIN.
 */
 static int	create_tmp_file(t_command *command, t_redirect *cur, char *tmp_path,
-	int tmpfile_fd, t_expand_ctx *ctx)
+	t_expand_ctx *ctx)
 {
-	int		write_fd;
+	int	write_fd;
+	int	read_fd;
 
 	write_fd = ft_open_file(tmp_path, 0, command);
 	read_heredoc_content(cur->filename, write_fd, ctx);
 	close(write_fd);
+	read_fd = -1;
 	if (!cur->next || cur->next->type != REDIR_HEREDOC)
-	{
-		if (tmpfile_fd != -1)
-			close(tmpfile_fd);
-		tmpfile_fd = ft_open_file(tmp_path, 1, command);
-	}
-	return (tmpfile_fd);
+		read_fd = ft_open_file(tmp_path, 1, command);
+	return (read_fd);
 }
 
 /*
 ** Gère tous les heredocs d'une commande :
-** - crée un fichier temporaire pour chacun (/tmp/heredoc_X)
-** - lit leur contenu depuis stdin
-** - garde le dernier heredoc ouvert en lecture (pour stdin)
-** - supprime les fichiers temporaires (unlink)
+** crée un fichier temporaire ; lit leur contenu depuis stdin,
+** garde dernier heredoc ouvert en lecture (pour stdin)...
 */
 int	get_heredoc(t_command *command, t_expand_ctx *ctx)
 {
@@ -100,10 +96,12 @@ int	get_heredoc(t_command *command, t_expand_ctx *ctx)
 	{
 		if (cur->type == REDIR_HEREDOC)
 		{
+			if (tmpfile_fd != -1)
+				close(tmpfile_fd);
 			tmp_path = ft_get_heredoc_filename(i++);
 			if (!tmp_path)
 				ft_exit_free("heredoc filename", EXIT_FAILURE, command);
-			tmpfile_fd = create_tmp_file(command, cur, tmp_path, tmpfile_fd, ctx);
+			tmpfile_fd = create_tmp_file(command, cur, tmp_path, ctx);
 			free(tmp_path);
 		}
 		cur = cur->next;
@@ -122,4 +120,3 @@ void	print_eof_warning(char *limiter_n)
 	write(2, limiter_n, ft_strlen(limiter_n) - 1);
 	ft_putstr_fd("')\n", 2);
 }
-

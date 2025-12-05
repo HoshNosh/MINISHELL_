@@ -6,12 +6,16 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 11:41:06 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/29 15:46:29 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 10:39:25 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 
+/*
+** Vérifie si une chaîne est un builtin (partie 1).
+** Teste echo, cd, pwd et export.
+*/
 static int	ft_is_builtin1(char *str)
 {
 	if (ft_strncmp(str, "echo", 4) == 0 && ft_strlen(str) == 4)
@@ -25,6 +29,10 @@ static int	ft_is_builtin1(char *str)
 	return (0);
 }
 
+/*
+** Vérifie si une chaîne est un builtin du shell.
+** Retourne 1 si builtin, 0 sinon.
+*/
 int	ft_is_builtin(char *str)
 {
 	if (ft_is_builtin1(str))
@@ -40,6 +48,10 @@ int	ft_is_builtin(char *str)
 	return (0);
 }
 
+/*
+** Affiche une erreur de builtin et met à jour exit_code.
+** Format: "minishell: path: error".
+*/
 int	ft_error_builtin(char *path, char *error, int error_code, int *exit_code)
 {
 	ft_puterror(path, NULL, error);
@@ -47,6 +59,10 @@ int	ft_error_builtin(char *path, char *error, int error_code, int *exit_code)
 	return (0);
 }
 
+/*
+** Vérifie si un chemin est un répertoire.
+** Retourne erreur 126 si c'est un répertoire.
+*/
 static int	ft_check_directory(char *path, int *exit_code)
 {
 	struct stat	file_stat;
@@ -59,6 +75,10 @@ static int	ft_check_directory(char *path, int *exit_code)
 	return (0);
 }
 
+/*
+** Vérifie qu'un chemin est exécutable et valide.
+** Teste l'existence, que ce n'est pas un répertoire, et les permissions.
+*/
 int	ft_check_path_builtin(char *path, int *exit_code)
 {
 	if (!ft_strchr(path, '/'))

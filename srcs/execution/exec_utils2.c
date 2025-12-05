@@ -6,13 +6,17 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/14 14:50:40 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/29 15:51:57 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 11:28:01 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "exec.h"
 #include "builtins.h"
 
+/*
+** Affiche un message d'erreur formaté sur stderr (fd 2).
+** Format: minishell: [cmd]: [cmd2]: [error]\n
+*/
 void	ft_puterror(char *cmd, char *cmd2, char *error)
 {
 	write(2, "minishell: ", 11);
@@ -31,6 +35,10 @@ void	ft_puterror(char *cmd, char *cmd2, char *error)
 	write(2, "\n", 1);
 }
 
+/*
+** Ajoute une nouvelle chaîne 'str' à la fin du tableau 'arr'.
+** Alloue un nouveau tableau et libère l'ancien 'arr' s'il existe.
+*/
 char	**ft_add_to_array(char **arr, char *str)
 {
 	char	**new_arr;
@@ -59,6 +67,10 @@ char	**ft_add_to_array(char **arr, char *str)
 	return (new_arr);
 }
 
+/*
+** Libère chaque chaîne dans le tableau 'tab', puis libère 'tab' lui-même.
+** Sécurisé contre les pointeurs NULL.
+*/
 void	ft_free_tab(char **tab)
 {
 	int	i;
@@ -75,7 +87,8 @@ void	ft_free_tab(char **tab)
 }
 
 /*
-** Ignore SIGPIPE pour éviter l’arrêt du shell lors d’un pipe brisé.
+** Ignore SIGPIPE pour éviter l’arrêt brutal du shell
+** lorsqu’un processus en écriture n’a plus de lecteur (pipe brisé).
 */
 void	setup_signal_handling(void)
 {

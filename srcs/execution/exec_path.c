@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 12:26:27 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/12/03 19:56:20 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 10:04:59 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,7 @@
 
 /*
 ** Vérifie que le chemin donné correspond à un exécutable valide :
-** - existence du fichier
-** - non répertoire
-** - droits d'exécution
+** existence du fichier; non répertoire; droits d'exécution
 ** En cas d’erreur, quitte le programme avec un code adapté.
 */
 void	ft_check_path(char *path, t_command *command)

@@ -6,12 +6,16 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:54:53 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/12/03 20:02:17 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 09:31:36 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 
+/*
+** Met à jour la variable OLDPWD dans l'environnement.
+** Remplace ou ajoute selon si elle existe déjà.
+*/
 void	ft_update_oldpwd_var(char ***envp, char *oldpwd)
 {
 	char	*key;
@@ -32,6 +36,10 @@ void	ft_update_oldpwd_var(char ***envp, char *oldpwd)
 		ft_add_new_env_var(envp, key, value);
 }
 
+/*
+** Met à jour la variable PWD avec le répertoire courant.
+** Utilise getcwd pour récupérer le chemin actuel.
+*/
 void	ft_update_pwd_var(char ***envp)
 {
 	char	cwd[PATH_MAX];
@@ -42,7 +50,7 @@ void	ft_update_pwd_var(char ***envp)
 	{
 		key = ft_strdup("PWD");
 		if (!key)
-		return ;
+			return ;
 		value = ft_strdup(cwd);
 		if (!value)
 		{
@@ -54,6 +62,10 @@ void	ft_update_pwd_var(char ***envp)
 	}
 }
 
+/*
+** Gère la commande "cd -" (retour au répertoire précédent).
+** Affiche le nouveau chemin et met à jour les variables.
+*/
 static void	ft_handle_cd_dash(char **tokens, int *exit_code, char ***envp)
 {
 	char	*new_tokens[3];
@@ -73,6 +85,10 @@ static void	ft_handle_cd_dash(char **tokens, int *exit_code, char ***envp)
 		printf("%s\n", oldpwd);
 }
 
+/*
+** Gère la commande "cd --" (ignore l'option).
+** Traite le troisième argument comme le répertoire cible.
+*/
 static void	ft_handle_cd_dashdash(char **tokens, int *exit_code, char ***envp)
 {
 	char	*new_tokens[3];
@@ -83,6 +99,10 @@ static void	ft_handle_cd_dashdash(char **tokens, int *exit_code, char ***envp)
 	ft_cd(new_tokens, exit_code, envp);
 }
 
+/*
+** Gère les options invalides et cas spéciaux de cd.
+** Traite "-", "--" et les options invalides.
+*/
 void	ft_cd_invalid_opt(char **tokens, int *exit_code, char ***envp)
 {
 	if (tokens[1] && tokens[1][0] == '-')

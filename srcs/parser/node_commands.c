@@ -6,15 +6,13 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/06 18:50:31 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/29 18:58:59 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 11:20:22 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "node_commands.h"
 #include "lexer.h"
 #include "parser.h"
-#include "shell.h"
 
 /*
 ** Crée un nœud de type NODE_COMMAND avec sa struct de cmd.

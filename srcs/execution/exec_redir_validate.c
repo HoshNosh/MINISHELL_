@@ -6,12 +6,16 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 12:28:24 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/29 20:33:47 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 09:22:34 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "exec.h"
 
+/*
+** Ouvre un fichier selon son type de redirection.
+** Retourne le fd ou -1 en cas d'erreur.
+*/
 static int	open_redir_file(t_redirect *redir)
 {
 	int	fd;
@@ -28,6 +32,10 @@ static int	open_redir_file(t_redirect *redir)
 	return (fd);
 }
 
+/*
+** Valide et stocke les fd de toutes les redirections.
+** Ferme tous les fd ouverts si erreur.
+*/
 static int	validate_and_store(t_redirect *redir, int *fds, int *count)
 {
 	t_redirect	*current;
@@ -54,6 +62,10 @@ static int	validate_and_store(t_redirect *redir, int *fds, int *count)
 	return (0);
 }
 
+/*
+** Valide toutes les redirections en tentant de les ouvrir.
+** Retourne un tableau de fd et le nombre de fd.
+*/
 int	validate_all_redirections(t_redirect *redir, int **fds_out, int *count_out)
 {
 	t_redirect	*current;

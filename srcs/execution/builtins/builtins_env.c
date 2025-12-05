@@ -6,12 +6,16 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 10:55:19 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/12/03 20:17:06 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 09:35:16 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 
+/*
+** Duplique une chaîne avec une longueur maximale.
+** Copie au maximum n caractères.
+*/
 char	*ft_strdup2(char *src, int n)
 {
 	char	*dup;
@@ -23,6 +27,10 @@ char	*ft_strdup2(char *src, int n)
 	return (dup);
 }
 
+/*
+** Affiche toutes les variables d'environnement.
+** Une variable par ligne.
+*/
 static void	ft_print_env_loop(char **envp, int output_fd)
 {
 	int	i;
@@ -41,6 +49,10 @@ static void	ft_print_env_loop(char **envp, int output_fd)
 	}
 }
 
+/*
+** Implémente la commande env du shell.
+** Affiche l'environnement ou retourne erreur si argument fourni.
+*/
 int	ft_env(char **envp, int output_fd, char **argv)
 {
 	if (argv[1])
@@ -55,6 +67,11 @@ int	ft_env(char **envp, int output_fd, char **argv)
 	ft_print_env_loop(envp, output_fd);
 	return (0);
 }
+
+/*
+** Crée une chaîne "PWD=..." avec le répertoire courant.
+** Utilise getcwd ou retourne "PWD=/" si échec.
+*/
 
 static char	*ft_get_pwd_env(void)
 {
@@ -74,6 +91,10 @@ static char	*ft_get_pwd_env(void)
 	return (pwd);
 }
 
+/*
+** Crée un environnement minimal pour env -i.
+** Contient PWD, SHLVL, _ et PATH par défaut.
+*/
 char	**ft_minimal_env(char **envp)
 {
 	char	**minimal_env;
@@ -88,7 +109,7 @@ char	**ft_minimal_env(char **envp)
 	minimal_env[1] = ft_strdup("SHLVL=1");
 	minimal_env[2] = ft_strdup("_=/usr/bin/env");
 	minimal_env[3] = ft_strdup("PATH=/usr/local/sbin:/usr/local/bin:"
-		"/usr/sbin:/usr/bin:/sbin:/bin");
+			"/usr/sbin:/usr/bin:/sbin:/bin");
 	minimal_env[4] = NULL;
 	return (minimal_env);
 }

@@ -6,12 +6,16 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/28 13:52:30 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/28 22:00:54 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 10:36:54 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 
+/*
+** Implémente la commande pwd du shell.
+** Affiche le répertoire courant ou erreur si option invalide.
+*/
 void	ft_pwd(int output_fd, char **tokens, int *exit_code)
 {
 	char	cwd[PATH_MAX];

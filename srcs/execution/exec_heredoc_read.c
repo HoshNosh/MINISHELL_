@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 12:31:26 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/12/03 18:58:20 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 10:40:34 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,23 +90,6 @@ static char	*read_line_heredoc(void)
 	return (line);
 }
 
-/*
-** Expand les variables dans la ligne du heredoc.
-** Retourne la ligne expandée ou la ligne originale si pas de variables.
-*
-static char	*expand_heredoc_line(char *line, t_expand_ctx *ctx)
-{
-	char	*expanded;
-
-	if (!has_variable(line))
-		return (line);
-	expanded = process_token_variables(line, ctx);
-	if (!expanded)
-		return (line);
-	free(line);
-	return (expanded);
-}*/
-
 static int	process_line(char *line, char *limiter_n, int tmpfile_fd,
 		t_expand_ctx *ctx)
 {
@@ -129,44 +112,6 @@ static int	process_line(char *line, char *limiter_n, int tmpfile_fd,
 	free(line);
 	return (0);
 }
-
-
-
-
-
-/*
-** Traite une ligne: check limiter, expand variables, écrit dans fd.
-** Return 0/1/-1/-2. 0 = continue, 1 = limiter trouvé, -1 = CTRL-C, -2 = EOF
-*
-static int	process_line(char *line, char *limiter_n, int tmpfile_fd,
-		t_expand_ctx *ctx)
-{
-	size_t	len;
-	char	*expanded;
-
-	if (g_sigint_received)
-		return (free(line), g_sigint_received = 0, -1);
-	if (!line)
-		return (-2);
-	len = ft_strlen(limiter_n);
-	if (len > 0 && limiter_n[len - 1] == '\n')
-		len--;
-	if (line && ft_strlen(line) == len
-		&& ft_strncmp(line, limiter_n, len) == 0)
-		return (free(line), 1);
-	if (has_variable(line))
-		expanded = process_token_variables(line, ctx);
-	else
-		expanded = NULL;
-	if (expanded)
-		ft_putstr_fd(expanded, tmpfile_fd);
-	else
-		ft_putstr_fd(line, tmpfile_fd);
-	ft_putstr_fd("\n", tmpfile_fd);
-	free(line);
-	free(expanded);
-	return (0);
-}*/
 
 /*
 ** Lit heredoc avec read(). Interrompu par CTRL-C grâce à sigaction.

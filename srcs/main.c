@@ -6,19 +6,18 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/25 13:29:02 by sdossa            #+#    #+#             */
-/*   Updated: 2025/12/03 20:35:29 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 13:18:21 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "builtins.h"
-#include "shell.h"
-#include "node_commands.h"
+#include "expand.h"
+#include "parser.h"
 #include "lexer.h"
 #include "exec.h"
 
 volatile sig_atomic_t	g_sigint_received = 0;
-
 extern void	rl_replace_line(const char *str, int n);
 
 /*
@@ -65,14 +64,14 @@ static void	copy_env_vars(t_mother_shell *shell, char **envp, int env_count)
 	shell->env[env_count] = NULL;
 }
 
-
 /*
 ** Version corrigée de la section critique de init_shell.
 ** Utilise ft_strdup pour ajouter PATH manuellement si l'environnement est vide.
 */
-static void init_shell(t_mother_shell *shell, char **envp)
+static void	init_shell(t_mother_shell *shell, char **envp)
 {
-	int i;
+	int	i;
+	int	j;
 
 	shell->ast = NULL;
 	shell->line = NULL;
@@ -81,7 +80,7 @@ static void init_shell(t_mother_shell *shell, char **envp)
 	if (!envp || !envp[0])
 	{
 		shell->env = ft_minimal_env(envp);
-			exit(1);
+		//exit(1);
 		return ;
 	}
 	i = 0;
@@ -90,21 +89,18 @@ static void init_shell(t_mother_shell *shell, char **envp)
 	shell->env = malloc(sizeof(char *) * (i + 1));
 	if (!shell->env)
 		exit(1);
-	int j = 0;
+	j = 0;
 	while (j <= i)
 		shell->env[j++] = NULL;
 	copy_env_vars(shell, envp, i);
 }
-
-
-
 
 /*
 ** Free tte la mémoire allouée pour la struct du shell.
 ** Free chaque var d'env puis le tab principal.
 ** Évite les fuites mémoire à la fermeture du programme ;).
 */
-/*static*/ void	free_shell(t_mother_shell *shell)
+void	free_shell(t_mother_shell *shell)
 {
 	int	i;
 

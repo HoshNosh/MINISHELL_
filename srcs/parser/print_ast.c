@@ -6,12 +6,12 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/08 00:20:03 by sdossa            #+#    #+#             */
-/*   Updated: 2025/12/01 10:26:07 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 11:30:41 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "print_ast.h"
+#include "parser.h"
 
 /*
 ** Affiche récursivement l'AST avec indentation.

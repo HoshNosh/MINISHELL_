@@ -6,12 +6,16 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 12:28:24 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/11/28 22:02:41 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 09:21:32 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "exec.h"
 
+/*
+** Vérifie les permissions et ouvre un fichier de redirection.
+** Quitte avec erreur si permissions insuffisantes.
+*/
 static void	check_and_open_file(t_command *cmd, t_redirect *cur, int flags,
 			int *fd)
 {
@@ -38,6 +42,10 @@ static void	check_and_open_file(t_command *cmd, t_redirect *cur, int flags,
 		ft_exit_free(cur->filename, EXIT_FAILURE, cmd);
 }
 
+/*
+** Applique un fd à stdin/stdout avec dup2.
+** Ferme le fd original après redirection.
+*/
 static void	apply_fd_to_stdio(int fd, int stdio_fd, char *err, t_command *cmd)
 {
 	if (fd != -1)
@@ -48,6 +56,10 @@ static void	apply_fd_to_stdio(int fd, int stdio_fd, char *err, t_command *cmd)
 	}
 }
 
+/*
+** Applique toutes les redirections d'entrée (<).
+** Seul le dernier fd d'entrée est appliqué à STDIN.
+*/
 void	infile_redirection(t_command *command)
 {
 	t_redirect	*cur;
@@ -64,6 +76,10 @@ void	infile_redirection(t_command *command)
 	apply_fd_to_stdio(fd, STDIN_FILENO, "dup2 input", command);
 }
 
+/*
+** Applique toutes les redirections de sortie (>).
+** Seul le dernier fd de sortie est appliqué à STDOUT.
+*/
 void	outfile_truncate_redirection(t_command *command)
 {
 	t_redirect	*cur;
@@ -81,6 +97,10 @@ void	outfile_truncate_redirection(t_command *command)
 	apply_fd_to_stdio(fd, STDOUT_FILENO, "dup2 output", command);
 }
 
+/*
+** Applique toutes les redirections d'ajout (>>).
+** Seul le dernier fd d'ajout est appliqué à STDOUT.
+*/
 void	outfile_append_redirection(t_command *command)
 {
 	t_redirect	*cur;

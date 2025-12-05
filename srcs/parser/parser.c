@@ -6,13 +6,12 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/07 20:19:45 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/29 18:56:30 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/05 11:30:27 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 #include "parser.h"
-#include "node_commands.h"
 
 /*
 ** Crée une struct t_command à partir des tokens[start...end-1].

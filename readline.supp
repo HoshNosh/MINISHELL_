@@ -1,4 +1,12 @@
 {
+   <Readline_complete>
+   Memcheck:Leak
+   match-leak-kinds: reachable,definite,possible,indirect
+   ...
+   obj:*/libreadline.so.*
+   ...
+}
+{
    <Readline>
    Memcheck:Leak
    match-leak-kinds: reachable

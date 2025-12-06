@@ -1,4 +1,4 @@
-# Minishell — Refonte (Version AST)
+# Minishell
 
 Cette refonte de **Minishell** consiste à **adapter le moteur d'exécution (exec)**, développé lors de la première version du projet, pour qu’il fonctionne désormais avec un **AST (Abstract Syntax Tree)**.
 L'objectif était de **réintégrer l'exec** dans une architecture basée sur un arbre syntaxique, en assurant la compatibilité avec les nouveaux types de nœuds et la logique du projet.

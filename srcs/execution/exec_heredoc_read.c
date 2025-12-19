@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/10 12:31:26 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/12/05 10:40:34 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/06 16:12:28 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,6 @@ int	read_heredoc_content(char *limiter_n, int tmpfile_fd, t_expand_ctx *ctx)
 
 	while (1)
 	{
-		//write(STDOUT_FILENO, "pipe heredoc> ", 14);
 		write(STDOUT_FILENO, "> ", 2);
 		line = read_line_heredoc();
 		result = process_line(line, limiter_n, tmpfile_fd, ctx);

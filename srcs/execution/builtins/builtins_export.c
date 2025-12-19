@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/27 16:22:17 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/12/05 09:42:08 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/06 15:59:11 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,11 @@ int	ft_extract_key_value(char *token, char **key, char **value)
 
 	equal_sign = ft_strchr(token, '=');
 	if (!equal_sign)
-		return (0);
+	{
+		*key = ft_strdup2(token, ft_strlen(token));
+		*value = NULL;
+		return (1);
+	}
 	*key = ft_strdup2(token, equal_sign - token);
 	*value = ft_strdup(equal_sign + 1);
 	if (!(*key) || !(*value))

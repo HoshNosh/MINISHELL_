@@ -3,23 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
+/*   By: nadgalle <nadgalle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/30 15:13:46 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/17 14:47:03 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/08 17:23:07 by nadgalle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
-
-static char	*ft_chardup(char *res)
-{
-	res = malloc(sizeof(char));
-	if (!res)
-		return (NULL);
-	res[0] = '\0';
-	return (res);
-}
 
 static	char	*ft_fetch_next_line(char *buffer, size_t l_len)
 {
@@ -67,7 +58,8 @@ static char	*ft_fetch_lignes(int fd, char *lines)
 	char	*joined;
 	int		read_bytes;
 
-	if (!lines && !(lines = ft_chardup("")))
+	lines = ft_init_lines(lines);
+	if (!lines)
 		return (NULL);
 	buf = malloc(BUFFER_SIZE + 1);
 	if (!buf)

@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 12:26:27 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/12/05 10:04:59 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/06 16:12:50 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,8 @@ char	*ft_join_path(char *cmd, char *path)
 	char	*joined_path;
 
 	path_tmp = ft_strjoin(path, "/");
+	if (!path_tmp)
+		return (NULL);
 	joined_path = ft_strjoin(path_tmp, cmd);
 	free(path_tmp);
 	return (joined_path);
@@ -130,9 +132,6 @@ char	*get_path(char *cmd, char **env)
 	if (ft_strchr(cmd, '/'))
 		return (ft_strdup(cmd));
 	paths = get_path_tab(env);
-	// if (!paths)
-	// 	paths = ft_split("/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:"
-	// 			"/sbin:/bin", ':');
 	if (!paths)
 		return (NULL);
 	return (search_in_paths(cmd, paths));

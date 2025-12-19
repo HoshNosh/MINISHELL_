@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 17:50:31 by sdossa            #+#    #+#             */
-/*   Updated: 2025/12/03 21:25:53 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/06 16:18:48 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,8 @@ char	*get_variable_value(char *var_name, t_expand_ctx *ctx)
 
 	if (ft_strcmp(var_name, "?") == 0)
 		return (ft_itoa(ctx->last_exit_code));
+	if (ft_strcmp(var_name, "$") == 0 || ft_strcmp(var_name, "$$") == 0)
+		return (ft_itoa(getpid()));
 	if (ft_strcmp(var_name, "UID") == 0)
 		return (ft_itoa(getuid()));
 	if (ft_strcmp(var_name, "EUID") == 0)
@@ -114,7 +116,7 @@ int	process_single_var(char **result, int i, t_expand_ctx *ctx)
 }
 
 /*
-** Traite toutes les variables d'un token.
+**Traite toutes les variables d'un token.
 ** Remplace chaque $ trouvé hors single quotes.
 */
 char	*process_token_variables(char *result, t_expand_ctx *ctx)

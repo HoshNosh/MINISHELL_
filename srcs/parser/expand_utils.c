@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/25 17:42:57 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/29 18:56:10 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/06 16:23:22 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,10 +91,21 @@ int	is_in_single_quotes(char *str, int pos)
 */
 char	*handle_special_var_cases(char *str, int start)
 {
+	int	tmp;
+
 	while (str[start] == '\x04')
 		start++;
 	if (str[start] == '?')
 		return (ft_strdup("?"));
+	if (str[start] == '$')
+	{
+		tmp = start + 1;
+		while (str[tmp] == '\x04')
+			tmp++;
+		if (str[tmp] == '$')
+			return (ft_strdup("$$"));
+		return (ft_strdup("$"));
+	}
 	if (str[start] == '"' || str[start] == '\'' || str[start] == '\0'
 		|| str[start] == '\x03')
 		return (ft_strdup(""));

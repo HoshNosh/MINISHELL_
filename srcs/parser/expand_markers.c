@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/16 17:14:11 by sdossa            #+#    #+#             */
-/*   Updated: 2025/11/29 18:58:33 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/06 16:21:10 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,25 +87,32 @@ static int	remove_markers(char *result)
 }
 
 /*
-** Nettoie les markers et protège les opérateurs si nécessaire.
+**  Nettoie les markers et protège les opérateurs si nécessaire.
 ** Ajoute \x01 devant les opérateurs échappés.
 */
 char	*clean_escape_markers(char *result)
 {
-	int	has_marker;
+	int		has_marker;
+	char	*protected;
+	int		len;
 
 	has_marker = remove_markers(result);
 	if (has_marker && is_operator_escaped(result))
 	{
-		result[1] = result[0];
-		result[0] = '\x01';
-		result[2] = '\0';
+		len = ft_strlen(result);
+		protected = malloc(len + 2);
+		if (!protected)
+			return (result);
+		protected[0] = '\x01';
+		ft_strlcpy(protected + 1, result, len + 1);
+		free(result);
+		return (protected);
 	}
 	return (result);
 }
 
 /*
-** Compte les tokens générés par un token avec markers.
+**  Compte les tokens générés par un token avec markers.
 ** Return toujours 1 (placeholder).
 */
 int	count_tokens_with_markers(char *temp)

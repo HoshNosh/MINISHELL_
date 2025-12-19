@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   builtins_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
+/*   By: nadgalle <nadgalle@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 11:41:06 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/12/05 10:39:25 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/08 17:46:18 by nadgalle         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,10 +67,12 @@ static int	ft_check_directory(char *path, int *exit_code)
 {
 	struct stat	file_stat;
 
-	if (stat(path, &file_stat) != -1)
+	if (stat(path, &file_stat) != 0)
+		return (0);
+	if (S_ISDIR(file_stat.st_mode))
 	{
-		if (S_ISDIR(file_stat.st_mode))
-			return (ft_error_builtin(path, "Is a directory", 126, exit_code));
+		ft_error_builtin(path, "Is a directory", 126, exit_code);
+		return (1);
 	}
 	return (0);
 }
@@ -91,11 +93,9 @@ int	ft_check_path_builtin(char *path, int *exit_code)
 		if (access(path, F_OK) != 0)
 			return (ft_error_builtin(path, strerror(errno), 127, exit_code));
 	}
-	if (ft_check_directory(path, exit_code) == 0)
-	{
-		if (access(path, X_OK) != 0)
-			return (ft_error_builtin(path, "Permission denied", 126,
-					exit_code));
-	}
+	if (ft_check_directory(path, exit_code))
+		return (0);
+	if (access(path, X_OK) != 0)
+		return (ft_error_builtin(path, "Permission denied", 126, exit_code));
 	return (1);
 }

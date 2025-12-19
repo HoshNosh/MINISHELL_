@@ -6,14 +6,31 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 11:41:06 by nadgalle          #+#    #+#             */
-/*   Updated: 2025/12/05 09:36:35 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/06 15:52:29 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
+#include "expand.h"
 
 /*
-** Exécute les builtins simples: echo, pwd, env.
+** Nettoie les markers finaux de tous les arguments.
+** Enlève le \x01 protégeant les opérateurs échappés.
+*/
+static void	clean_builtin_argv(char **argv)
+{
+	int	i;
+
+	i = 0;
+	while (argv[i])
+	{
+		argv[i] = clean_final_marker(argv[i]);
+		i++;
+	}
+}
+
+/*
+** Execute les builtins simples: echo, pwd, env.
 ** Ces commandes ne modifient pas l'environnement.
 */
 static void	ft_exec_simple_builtins(char **tokens, t_builtin_ctx *ctx)
@@ -27,7 +44,7 @@ static void	ft_exec_simple_builtins(char **tokens, t_builtin_ctx *ctx)
 }
 
 /*
-** Exécute les builtins qui modifient l'environnement.
+** Execute les builtins qui modifient l'environnement.
 ** Traite cd, export et unset.
 */
 static void	ft_exec_env_builtins(char **tokens, t_builtin_ctx *ctx)
@@ -41,11 +58,12 @@ static void	ft_exec_env_builtins(char **tokens, t_builtin_ctx *ctx)
 }
 
 /*
-** Dispatcher principal pour l'exécution des builtins.
+** Dispatcher principal pour l'execution des builtins.
 ** Route vers le bon builtin selon le nom de commande.
 */
 void	ft_exec_builtin(char **tokens, t_builtin_ctx *ctx)
 {
+	clean_builtin_argv(tokens);
 	*ctx->exit_status = 0;
 	if (ft_strcmp(tokens[0], "echo") == 0
 		|| ft_strcmp(tokens[0], "pwd") == 0

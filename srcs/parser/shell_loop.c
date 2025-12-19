@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 17:26:20 by sdossa            #+#    #+#             */
-/*   Updated: 2025/12/05 11:32:53 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/08 14:27:27 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ char	*read_input(t_mother_shell *shell)
 	return (shell->line);
 }
 
-/*
+/**
 ** Gère le statut du signal SIGINT reçu.
 ** Met à jour last_status à 130 si CTRL-C détecté.
 */
@@ -99,6 +99,8 @@ void	shell_loop(t_mother_shell *shell)
 				continue ;
 		}
 		should_continue = process_line(shell->line, shell);
+		if (shell->last_status == 131)
+			ft_putstr_fd("Quit (core dumped)\n", 2);
 		free(shell->line);
 		shell->line = NULL;
 		if (!should_continue)

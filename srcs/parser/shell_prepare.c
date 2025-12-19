@@ -6,7 +6,7 @@
 /*   By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/28 17:26:20 by sdossa            #+#    #+#             */
-/*   Updated: 2025/12/05 11:32:59 by sdossa           ###   ########.fr       */
+/*   Updated: 2025/12/06 14:39:49 by sdossa           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ static int	validate_and_handle_error(char **tokens, t_mother_shell *shell)
 {
 	if (!validate_syntax(tokens))
 	{
-		write(2, "minishell: syntax error near unexpected token\n", 47);
+		write(2, "minishell: syntax error near unexpected token\n", 46);
 		shell->last_status = 2;
 		free_tokens(tokens);
 		if (!isatty(STDIN_FILENO))

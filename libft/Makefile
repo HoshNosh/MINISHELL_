@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+         #
+#    By: nadgalle <nadgalle@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/28 19:36:45 by sdossa            #+#    #+#              #
-#    Updated: 2025/11/19 16:32:06 by sdossa           ###   ########.fr        #
+#    Updated: 2025/12/08 17:15:22 by nadgalle         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -24,7 +24,7 @@ BONUS = ft_bonus.lstadd_back.c ft_bonus.lstadd_front.c ft_bonus.lstclear.c \
 SRCS = ft_isalpha.c ft_isdigit.c ft_isalnum.c ft_isascii.c ft_isprint.c ft_strlen.c ft_memset.c ft_bzero.c ft_memcpy.c \
 ft_memmove.c ft_strlcpy.c ft_strlcat.c ft_toupper.c ft_tolower.c ft_strchr.c ft_strrchr.c ft_memchr.c ft_memcmp.c ft_strnstr.c \
 ft_atoi.c ft_calloc.c ft_strdup.c ft_substr.c ft_strjoin.c ft_strtrim.c ft_split.c ft_itoa.c ft_strmapi.c ft_striteri.c ft_realloc.c\
-ft_putchar_fd.c ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c ft_strcmp.c ft_strncmp.c ft_isnumber.c ft_free_arr.c get_next_line.c
+ft_putchar_fd.c ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c ft_strcmp.c ft_strncmp.c ft_isnumber.c ft_free_arr.c get_next_line.c get_next_line_utils.c
 
 OBJ = $(SRCS:.c=.o)
 OBJB = $(BONUS:.c=.o)

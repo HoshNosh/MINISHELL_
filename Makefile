@@ -6,7 +6,7 @@
 #    By: sdossa <sdossa@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/08/25 13:01:19 by sdossa            #+#    #+#              #
-#    Updated: 2025/11/02 15:29:44 by sdossa           ###   ########.fr        #
+#    Updated: 2025/12/06 13:40:55 by sdossa           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -107,7 +107,9 @@ fclean: clean
 		make fclean -C ./libft
 
 
-re: fclean all
+re:
+	$(MAKE) fclean
+	$(MAKE) all
 
 norm:
 	@echo "$(BOLD)$(BEIGE)Checking norminette...$(RESET)"
